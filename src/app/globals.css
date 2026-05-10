@@ -3,6 +3,12 @@
 :root {
   --background: #ffffff;
   --foreground: #111827;
+
+  --color-primary: #030712;
+  --color-primary-hover: #111827;
+  --color-border: #e5e7eb;
+  --color-muted: #6b7280;
+  --color-soft-bg: #f3f4f6;
 }
 
 * {
@@ -25,9 +31,114 @@ a {
   text-decoration: none;
 }
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+@layer components {
+  a.btn-primary,
+  button.btn-primary {
+    @apply inline-flex h-12 items-center justify-center rounded-2xl px-6 text-sm font-bold transition;
+    background-color: var(--color-primary);
+    color: #ffffff !important;
+  }
+
+  a.btn-primary:hover,
+  button.btn-primary:hover {
+    background-color: var(--color-primary-hover);
+    color: #ffffff !important;
+  }
+
+  a.btn-primary:visited,
+  button.btn-primary:visited {
+    color: #ffffff !important;
+  }
+
+  a.btn-secondary,
+  button.btn-secondary {
+    @apply inline-flex h-12 items-center justify-center rounded-2xl border bg-white px-6 text-sm font-bold transition;
+    border-color: var(--color-border);
+    color: #111827 !important;
+  }
+
+  a.btn-secondary:hover,
+  button.btn-secondary:hover {
+    background-color: #f9fafb;
+    color: #111827 !important;
+  }
+
+  a.btn-secondary:visited,
+  button.btn-secondary:visited {
+    color: #111827 !important;
+  }
+
+  a.btn-soft,
+  button.btn-soft {
+    @apply inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-bold transition;
+    background-color: var(--color-soft-bg);
+    color: #374151 !important;
+  }
+
+  a.btn-soft:hover,
+  button.btn-soft:hover {
+    background-color: #e5e7eb;
+    color: #111827 !important;
+  }
+
+  a.btn-soft:visited,
+  button.btn-soft:visited {
+    color: #374151 !important;
+  }
+
+  a.btn-dark-outline,
+  button.btn-dark-outline {
+    @apply inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold transition;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff !important;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  }
+
+  a.btn-dark-outline:hover,
+  button.btn-dark-outline:hover {
+    background-color: rgba(255, 255, 255, 0.16);
+    color: #ffffff !important;
+  }
+
+  a.btn-dark-outline:visited,
+  button.btn-dark-outline:visited {
+    color: #ffffff !important;
+  }
+
+  .card {
+    @apply rounded-3xl border border-gray-100 bg-white shadow-sm;
+  }
+
+  .muted-text {
+    @apply text-sm leading-6 text-gray-500;
+  }
 }

@@ -3,7 +3,7 @@ interface SearchBoxProps {
 }
 
 export default function SearchBox({
-                                      placeholder = "생일, 기념일, 밈, 팬덤 이벤트 검색",
+                                      placeholder = "인물, 생일, 사건, 밈, 캐릭터, 날짜 검색",
                                   }: SearchBoxProps) {
     return (
         <form
@@ -20,14 +20,15 @@ export default function SearchBox({
                 <select
                     name="category"
                     className="h-12 rounded-2xl bg-gray-50 px-4 text-sm outline-none ring-1 ring-gray-100 focus:bg-white focus:ring-black"
+                    defaultValue=""
                 >
-                    <option>전체 카테고리</option>
-                    <option>생일</option>
-                    <option>기념일</option>
-                    <option>밈</option>
-                    <option>팬덤</option>
-                    <option>브랜드</option>
-                    <option>역사</option>
+                    <option value="">전체</option>
+                    <option value="BIRTHDAY">생일</option>
+                    <option value="HISTORY">사건/역사</option>
+                    <option value="MEME">밈</option>
+                    <option value="ANNIVERSARY">기념일</option>
+                    <option value="FANDOM">팬덤</option>
+                    <option value="BRAND">브랜드</option>
                 </select>
 
                 <button className="h-12 rounded-2xl bg-black px-6 text-sm font-bold text-white transition hover:bg-gray-800">

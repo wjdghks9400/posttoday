@@ -35,17 +35,27 @@ function mapCategory(category: string): CalendarEvent["category"] {
         CELEBRITY: "celebrity",
         INFLUENCER: "influencer",
         KPOP: "kpop",
+        ESPORTS: "esports",
+        GAME: "game",
+        ANIME: "anime",
         MEME: "meme",
-        ANNIVERSARY: "anniversary",
-        HISTORY: "history",
         BRAND: "brand",
+        HISTORY: "history",
+        ETC: "etc",
     };
 
-    return categoryMap[category] ?? "anniversary";
+    return categoryMap[category] ?? "etc";
 }
 
 function mapTrustLevel(trustLevel: string): CalendarEvent["trustLevel"] {
-    return trustLevel as CalendarEvent["trustLevel"];
+    const trustLevelMap: Record<string, CalendarEvent["trustLevel"]> = {
+        OFFICIAL: "OFFICIAL",
+        SOURCE_VERIFIED: "SOURCE_VERIFIED",
+        COMMUNITY: "COMMUNITY",
+        UNCERTAIN: "UNCERTAIN",
+    };
+
+    return trustLevelMap[trustLevel] ?? "UNCERTAIN";
 }
 
 function mapSourceType(
@@ -86,118 +96,119 @@ function mapEvent(event: PrismaEventWithRelations): CalendarEvent {
     };
 }
 
+function getDayOfYear(month: number, day: number) {
+    const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    return monthDays.slice(0, month - 1).reduce((sum, value) => sum + value, 0) + day;
+}
+
+function getDistanceFromToday(event: PrismaEventWithRelations, month: number, day: number) {
+    const todayValue = getDayOfYear(month, day);
+    const eventValue = getDayOfYear(event.month, event.day);
+
+    if (eventValue >= todayValue) {
+        return eventValue - todayValue;
+    }
+
+    return 365 - todayValue + eventValue;
+}
+
 export async function getHomeDataFromDb() {
     const today = new Date();
     const month = today.getMonth() + 1;
     const day = today.getDate();
 
-    const [
-        todayEvents,
-        featuredEvents,
-        weeklyEvents,
-        total,
-        official,
-        community,
-        pending,
-    ] = await Promise.all([
-        prisma.event.findMany({
-            where: {
-                month,
-                day,
-                status: "PUBLISHED",
-            },
-            include: {
-                sources: true,
-                tags: {
-                    include: {
-                        tag: true,
+    const [todayEvents, allEvents, total, official, community, pending] =
+        await Promise.all([
+            prisma.event.findMany({
+                where: {
+                    month,
+                    day,
+                    status: "PUBLISHED",
+                },
+                include: {
+                    sources: true,
+                    tags: {
+                        include: {
+                            tag: true,
+                        },
                     },
                 },
-            },
-            orderBy: {
-                createdAt: "desc",
-            },
-            take: 6,
-        }),
+                orderBy: [
+                    {
+                        type: "asc",
+                    },
+                    {
+                        createdAt: "desc",
+                    },
+                ],
+            }),
 
-        prisma.event.findMany({
-            where: {
-                status: "PUBLISHED",
-            },
-            include: {
-                sources: true,
-                tags: {
-                    include: {
-                        tag: true,
+            prisma.event.findMany({
+                where: {
+                    status: "PUBLISHED",
+                },
+                include: {
+                    sources: true,
+                    tags: {
+                        include: {
+                            tag: true,
+                        },
                     },
                 },
-            },
-            orderBy: {
-                createdAt: "desc",
-            },
-            take: 3,
-        }),
-
-        prisma.event.findMany({
-            where: {
-                status: "PUBLISHED",
-            },
-            include: {
-                sources: true,
-                tags: {
-                    include: {
-                        tag: true,
-                    },
+                orderBy: {
+                    createdAt: "desc",
                 },
-            },
-            orderBy: [
-                {
-                    month: "asc",
+                take: 80,
+            }),
+
+            prisma.event.count({
+                where: {
+                    status: "PUBLISHED",
                 },
-                {
-                    day: "asc",
+            }),
+
+            prisma.event.count({
+                where: {
+                    status: "PUBLISHED",
+                    trustLevel: "OFFICIAL",
                 },
-            ],
-            take: 7,
-        }),
+            }),
 
-        prisma.event.count({
-            where: {
-                status: "PUBLISHED",
-            },
-        }),
+            prisma.event.count({
+                where: {
+                    status: "PUBLISHED",
+                    trustLevel: "COMMUNITY",
+                },
+            }),
 
-        prisma.event.count({
-            where: {
-                status: "PUBLISHED",
-                trustLevel: "OFFICIAL",
-            },
-        }),
+            prisma.submission.count({
+                where: {
+                    status: "PENDING",
+                },
+            }),
+        ]);
 
-        prisma.event.count({
-            where: {
-                status: "PUBLISHED",
-                trustLevel: "COMMUNITY",
-            },
-        }),
+    const upcomingEvents = allEvents
+        .filter((event) => !(event.month === month && event.day === day))
+        .sort((a, b) => {
+            const aDistance = getDistanceFromToday(a, month, day);
+            const bDistance = getDistanceFromToday(b, month, day);
 
-        prisma.submission.count({
-            where: {
-                status: "PENDING",
-            },
-        }),
-    ]);
+            if (aDistance !== bDistance) {
+                return aDistance - bDistance;
+            }
 
-    let finalTodayEvents = todayEvents;
+            return a.title.localeCompare(b.title);
+        })
+        .slice(0, 9);
 
-    if (finalTodayEvents.length === 0) {
-        finalTodayEvents = weeklyEvents.slice(0, 6);
-    }
+    const recentEvents = allEvents.slice(0, 6);
 
     return {
-        todayEvents: finalTodayEvents.map(mapEvent),
-        featuredEvents: featuredEvents.map(mapEvent),
-        weeklyEvents: weeklyEvents.map(mapEvent),
+        todayEvents: todayEvents.map(mapEvent),
+        upcomingEvents: upcomingEvents.map(mapEvent),
+        recentEvents: recentEvents.map(mapEvent),
         stats: {
             total,
             official,

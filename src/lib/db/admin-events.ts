@@ -1,31 +1,21 @@
 import { prisma } from "@/lib/prisma";
 
-const statusLabelMap = {
-    DRAFT: "초안",
-    PUBLISHED: "공개",
-    HIDDEN: "",
-} as const;
-
-const trustLabelMap = {
-    OFFICIAL: "공식 확인",
-    SOURCE_VERIFIED: "출처 확인",
-    COMMUNITY: "커뮤니티 기반",
-    UNCERTAIN: "불확실",
-} as const;
-
-export async function getAdminEventsFromDb() {
+export async function getAdminEvents() {
     const events = await prisma.event.findMany({
         include: {
             sources: true,
-            tags: {
-                include: {
-                    tag: true,
-                },
+        },
+        orderBy: [
+            {
+                month: "asc",
             },
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
+            {
+                day: "asc",
+            },
+            {
+                createdAt: "desc",
+            },
+        ],
     });
 
     return events.map((event) => ({
@@ -34,11 +24,29 @@ export async function getAdminEventsFromDb() {
         slug: event.slug,
         month: event.month,
         day: event.day,
+        year: event.year,
+        type: event.type,
+        category: event.category,
         description: event.description,
+        trustLevel: event.trustLevel,
         status: event.status,
-        statusLabel: statusLabelMap[event.status],
-        trustLabel: trustLabelMap[event.trustLevel],
         sourceCount: event.sources.length,
-        tags: event.tags.map((item) => item.tag.name),
+        createdAt: event.createdAt,
+        updatedAt: event.updatedAt,
     }));
+}
+
+export async function getAdminEventBySlug(slug: string) {
+    return prisma.event.findUnique({
+        where: {
+            slug,
+        },
+        include: {
+            sources: {
+                orderBy: {
+                    createdAt: "asc",
+                },
+            },
+        },
+    });
 }

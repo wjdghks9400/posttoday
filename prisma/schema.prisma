@@ -20,10 +20,13 @@ enum EventCategory {
   CELEBRITY
   INFLUENCER
   KPOP
+  ESPORTS
+  GAME
+  ANIME
   MEME
-  ANNIVERSARY
-  HISTORY
   BRAND
+  HISTORY
+  ETC
 }
 
 enum TrustLevel {

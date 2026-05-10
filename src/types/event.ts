@@ -1,4 +1,4 @@
-export type EventType =
+export type CalendarEventType =
     | "BIRTHDAY"
     | "ANNIVERSARY"
     | "MEME"
@@ -6,26 +6,31 @@ export type EventType =
     | "HISTORY"
     | "BRAND";
 
+export type CalendarEventCategory =
+    | "celebrity"
+    | "influencer"
+    | "kpop"
+    | "esports"
+    | "game"
+    | "anime"
+    | "meme"
+    | "brand"
+    | "history"
+    | "etc";
+
 export type TrustLevel =
     | "OFFICIAL"
     | "SOURCE_VERIFIED"
     | "COMMUNITY"
     | "UNCERTAIN";
 
-export type EventCategory =
-    | "celebrity"
-    | "influencer"
-    | "kpop"
-    | "meme"
-    | "anniversary"
-    | "history"
-    | "brand";
+export type SourceType = "official" | "news" | "wiki" | "community" | "sns";
 
-export interface Source {
+export interface CalendarEventSource {
     id: string;
     title: string;
     url: string;
-    type: "official" | "news" | "wiki" | "community" | "sns";
+    type: SourceType;
 }
 
 export interface CalendarEvent {
@@ -35,11 +40,11 @@ export interface CalendarEvent {
     month: number;
     day: number;
     year?: number;
-    type: EventType;
-    category: EventCategory;
+    type: CalendarEventType;
+    category: CalendarEventCategory;
     description: string;
     contentIdea: string;
     trustLevel: TrustLevel;
     tags: string[];
-    sources: Source[];
+    sources: CalendarEventSource[];
 }

@@ -35,13 +35,16 @@ function mapCategory(category: string): CalendarEvent["category"] {
         CELEBRITY: "celebrity",
         INFLUENCER: "influencer",
         KPOP: "kpop",
+        ESPORTS: "esports",
+        GAME: "game",
+        ANIME: "anime",
         MEME: "meme",
-        ANNIVERSARY: "anniversary",
-        HISTORY: "history",
         BRAND: "brand",
+        HISTORY: "history",
+        ETC: "etc",
     };
 
-    return categoryMap[category] ?? "anniversary";
+    return categoryMap[category] ?? "etc";
 }
 
 function mapTrustLevel(trustLevel: string): CalendarEvent["trustLevel"] {
@@ -86,6 +89,26 @@ function mapEvent(event: PrismaEventWithRelations): CalendarEvent {
     };
 }
 
+function getSlugCandidates(slug: string) {
+    const candidates = new Set<string>();
+
+    candidates.add(slug);
+
+    try {
+        candidates.add(decodeURIComponent(slug));
+    } catch {
+        // ignore
+    }
+
+    try {
+        candidates.add(encodeURIComponent(slug));
+    } catch {
+        // ignore
+    }
+
+    return Array.from(candidates);
+}
+
 export async function getPublishedEvents(): Promise<CalendarEvent[]> {
     const events = await prisma.event.findMany({
         where: {
@@ -120,15 +143,11 @@ export async function getTodayEventsFromDb(): Promise<CalendarEvent[]> {
     const month = today.getMonth() + 1;
     const day = today.getDate();
 
-    const todayEvents = await getEventsByDateFromDb(month, day);
-
-    if (todayEvents.length > 0) {
-        return todayEvents;
-    }
-
-    const fallbackEvents = await prisma.event.findMany({
+    const events = await prisma.event.findMany({
         where: {
             status: "PUBLISHED",
+            month,
+            day,
         },
         include: {
             sources: true,
@@ -138,18 +157,12 @@ export async function getTodayEventsFromDb(): Promise<CalendarEvent[]> {
                 },
             },
         },
-        orderBy: [
-            {
-                month: "asc",
-            },
-            {
-                day: "asc",
-            },
-        ],
-        take: 6,
+        orderBy: {
+            createdAt: "desc",
+        },
     });
 
-    return fallbackEvents.map(mapEvent);
+    return events.map(mapEvent);
 }
 
 export async function getFeaturedEventsFromDb(): Promise<CalendarEvent[]> {
@@ -204,9 +217,14 @@ export async function getWeeklyEventsFromDb(): Promise<CalendarEvent[]> {
 export async function getEventBySlugFromDb(
     slug: string
 ): Promise<CalendarEvent | null> {
-    const event = await prisma.event.findUnique({
+    const slugCandidates = getSlugCandidates(slug);
+
+    const event = await prisma.event.findFirst({
         where: {
-            slug,
+            status: "PUBLISHED",
+            slug: {
+                in: slugCandidates,
+            },
         },
         include: {
             sources: true,
@@ -218,7 +236,7 @@ export async function getEventBySlugFromDb(
         },
     });
 
-    if (!event || event.status !== "PUBLISHED") {
+    if (!event) {
         return null;
     }
 
@@ -228,11 +246,13 @@ export async function getEventBySlugFromDb(
 export async function getRelatedEventsFromDb(
     currentSlug: string
 ): Promise<CalendarEvent[]> {
+    const slugCandidates = getSlugCandidates(currentSlug);
+
     const events = await prisma.event.findMany({
         where: {
             status: "PUBLISHED",
             slug: {
-                not: currentSlug,
+                notIn: slugCandidates,
             },
         },
         include: {
@@ -258,9 +278,9 @@ export async function getEventsByDateFromDb(
 ): Promise<CalendarEvent[]> {
     const events = await prisma.event.findMany({
         where: {
+            status: "PUBLISHED",
             month,
             day,
-            status: "PUBLISHED",
         },
         include: {
             sources: true,
@@ -278,50 +298,17 @@ export async function getEventsByDateFromDb(
     return events.map(mapEvent);
 }
 
-export async function getEventStatsFromDb() {
-    const [total, official, community, pending] = await Promise.all([
-        prisma.event.count({
-            where: {
-                status: "PUBLISHED",
-            },
-        }),
-        prisma.event.count({
-            where: {
-                status: "PUBLISHED",
-                trustLevel: "OFFICIAL",
-            },
-        }),
-        prisma.event.count({
-            where: {
-                status: "PUBLISHED",
-                trustLevel: "COMMUNITY",
-            },
-        }),
-        prisma.submission.count({
-            where: {
-                status: "PENDING",
-            },
-        }),
-    ]);
-
-    return {
-        total,
-        official,
-        community,
-        pending,
-    };
-}
-
 export async function getCalendarDaysFromDb(year: number, month: number) {
     const firstDate = new Date(year, month - 1, 1);
     const lastDate = new Date(year, month, 0);
-    const firstDay = firstDate.getDay();
-    const totalDays = lastDate.getDate();
 
-    const monthEvents = await prisma.event.findMany({
+    const firstDayOfWeek = firstDate.getDay();
+    const lastDay = lastDate.getDate();
+
+    const events = await prisma.event.findMany({
         where: {
-            month,
             status: "PUBLISHED",
+            month,
         },
         include: {
             sources: true,
@@ -331,44 +318,56 @@ export async function getCalendarDaysFromDb(year: number, month: number) {
                 },
             },
         },
-        orderBy: [
-            {
-                day: "asc",
-            },
-            {
-                createdAt: "desc",
-            },
-        ],
+        orderBy: {
+            day: "asc",
+        },
     });
 
-    const mappedEvents = monthEvents.map(mapEvent);
+    const mappedEvents = events.map(mapEvent);
 
-    const eventsByDay = new Map<number, CalendarEvent[]>();
-
-    for (const event of mappedEvents) {
-        const currentEvents = eventsByDay.get(event.day) ?? [];
-        currentEvents.push(event);
-        eventsByDay.set(event.day, currentEvents);
-    }
-
-    const days: Array<{
+    const days: {
         day: number | null;
         events: CalendarEvent[];
-    }> = [];
+    }[] = [];
 
-    for (let i = 0; i < firstDay; i += 1) {
+    for (let i = 0; i < firstDayOfWeek; i += 1) {
         days.push({
             day: null,
             events: [],
         });
     }
 
-    for (let day = 1; day <= totalDays; day += 1) {
+    for (let day = 1; day <= lastDay; day += 1) {
         days.push({
             day,
-            events: eventsByDay.get(day) ?? [],
+            events: mappedEvents.filter((event) => event.day === day),
         });
     }
 
     return days;
+}
+
+export async function getEventStatsFromDb() {
+    const events = await prisma.event.findMany({
+        where: {
+            status: "PUBLISHED",
+        },
+        select: {
+            trustLevel: true,
+        },
+    });
+
+    const pending = await prisma.submission.count({
+        where: {
+            status: "PENDING",
+        },
+    });
+
+    return {
+        total: events.length,
+        official: events.filter((event) => event.trustLevel === "OFFICIAL").length,
+        community: events.filter((event) => event.trustLevel === "COMMUNITY")
+            .length,
+        pending,
+    };
 }

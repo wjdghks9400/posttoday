@@ -9,10 +9,10 @@ const seedEvents = [
         month: 5,
         day: 7,
         type: "ANNIVERSARY" as const,
-        category: "ANNIVERSARY" as const,
+        category: "ETC" as const,
         description: "웃음과 긍정적인 에너지를 나누자는 취지의 기념일입니다.",
         contentIdea:
-            "직장인 공감 짤, 친구에게 보내는 유머 카드, 오늘 하루 웃겼던 순간을 숏폼으로 만들기 좋아요.",
+            "직장인 공감 짤, 친구에게 보내는 유머 카드, 오늘 하루 웃겼던 순간을 숏폼이나 SNS 게시물로 만들기 좋아요.",
         trustLevel: "SOURCE_VERIFIED" as const,
         tags: ["기념일", "힐링", "SNS소재"],
         sources: [
@@ -68,6 +68,28 @@ const seedEvents = [
             },
         ],
     },
+    {
+        title: "페이커 생일",
+        slug: "faker-birthday",
+        month: 5,
+        day: 7,
+        type: "BIRTHDAY" as const,
+        category: "ESPORTS" as const,
+        description:
+            "프로게이머 페이커의 생일입니다. 팬덤 사이에서 축하 게시물과 관련 콘텐츠가 자주 올라오는 소재입니다.",
+        contentIdea:
+            "페이커의 생일을 맞아 팬들이 기억하는 명장면, 우승 순간, 인상 깊었던 인터뷰를 모아 콘텐츠로 활용할 수 있어요.",
+        trustLevel: "SOURCE_VERIFIED" as const,
+        tags: ["e스포츠", "생일", "팬덤"],
+        sources: [
+            {
+                title: "공개 프로필 자료",
+                url: "https://example.com",
+                type: "WIKI" as const,
+                verified: true,
+            },
+        ],
+    },
 ];
 
 async function main() {
@@ -118,6 +140,12 @@ async function main() {
                 },
             });
         }
+
+        await prisma.eventTag.deleteMany({
+            where: {
+                eventId: event.id,
+            },
+        });
 
         for (const tagName of item.tags) {
             const tag = await prisma.tag.upsert({

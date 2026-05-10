@@ -1,40 +1,103 @@
 import { prisma } from "@/lib/prisma";
 
-const typeLabelMap = {
-    NEW_EVENT: "신규 제보",
-    EDIT_REQUEST: "수정 제안",
-    SOURCE_ADD: "출처 추가",
-    REPORT: "신고",
-} as const;
+export type SubmissionFilter =
+    | "active"
+    | "all"
+    | "pending"
+    | "need_more"
+    | "approved"
+    | "rejected";
 
-const statusLabelMap = {
-    PENDING: "승인 대기",
-    APPROVED: "승인 완료",
-    REJECTED: "반려",
-    NEED_MORE: "추가 확인",
-} as const;
+export async function getSubmissionsFromDb(filter: SubmissionFilter = "active") {
+    const where =
+        filter === "active"
+            ? {
+                status: {
+                    in: ["PENDING", "NEED_MORE"] as const,
+                },
+            }
+            : filter === "pending"
+                ? {
+                    status: "PENDING" as const,
+                }
+                : filter === "need_more"
+                    ? {
+                        status: "NEED_MORE" as const,
+                    }
+                    : filter === "approved"
+                        ? {
+                            status: "APPROVED" as const,
+                        }
+                        : filter === "rejected"
+                            ? {
+                                status: "REJECTED" as const,
+                            }
+                            : {};
 
-export async function getSubmissionsFromDb() {
     const submissions = await prisma.submission.findMany({
+        where,
         orderBy: {
             createdAt: "desc",
         },
     });
 
-    return submissions.map((submission) => ({
-        id: submission.id,
-        title: submission.title,
-        category: submission.category ?? "-",
-        date:
-            submission.month && submission.day
-                ? `${submission.month}월 ${submission.day}일`
-                : "-",
-        sourceUrl: submission.sourceUrl ?? "-",
-        description: submission.description,
-        type: typeLabelMap[submission.type],
-        status: submission.status,
-        statusLabel: statusLabelMap[submission.status],
-        createdAt: submission.createdAt.toISOString().slice(0, 10),
-        adminNote: submission.adminNote ?? "",
-    }));
+    return Promise.all(
+        submissions.map(async (submission) => {
+            const targetEvent =
+                submission.month && submission.day
+                    ? await prisma.event.findFirst({
+                        where: {
+                            title: submission.title,
+                            month: submission.month,
+                            day: submission.day,
+                        },
+                        select: {
+                            id: true,
+                            slug: true,
+                            title: true,
+                        },
+                    })
+                    : null;
+
+            return {
+                ...submission,
+                targetEvent,
+            };
+        })
+    );
+}
+
+export async function getSubmissionCounts() {
+    const [pending, needMore, approved, rejected, total] = await Promise.all([
+        prisma.submission.count({
+            where: {
+                status: "PENDING",
+            },
+        }),
+        prisma.submission.count({
+            where: {
+                status: "NEED_MORE",
+            },
+        }),
+        prisma.submission.count({
+            where: {
+                status: "APPROVED",
+            },
+        }),
+        prisma.submission.count({
+            where: {
+                status: "REJECTED",
+            },
+        }),
+        prisma.submission.count(),
+    ]);
+
+    return {
+        active: pending + needMore,
+        pending,
+        needMore,
+        approved,
+        rejected,
+        total,
+    };
 }

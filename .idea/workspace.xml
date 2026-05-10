@@ -4,11 +4,47 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="21c0c601-302c-4571-adea-c09605ca20bd" name="변경" comment="" />
+    <list default="true" id="21c0c601-302c-4571-adea-c09605ca20bd" name="변경" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/admin/events/[slug]/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/events/[slug]/edit-request/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/events/[slug]/source-request/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/admin/EventActionButtons.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/submit/EditRequestForm.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/submit/SourceRequestForm.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lib/db/admin.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/lib/event-options.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/migrations/migration_lock.toml" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/migrations/migration_lock.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/seed.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/admin/events/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/admin/events/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/admin/events/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/admin/events/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/admin/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/admin/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/admin/submissions/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/admin/submissions/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/admin/submissions/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/admin/submissions/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/events/[slug]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/events/[slug]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/submit/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/submit/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/submit/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/submit/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/admin/SubmissionActionButtons.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/admin/SubmissionActionButtons.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/event/EventCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/event/EventCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/search/SearchBox.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/search/SearchBox.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/submit/SubmissionForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/submit/SubmissionForm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/db/admin-events.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/admin-events.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/db/events.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/events.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/db/home.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/home.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/db/submissions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/submissions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/event.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/event.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -17,24 +53,27 @@
   &quot;associatedIndex&quot;: 4
 }</component>
   <component name="ProjectId" id="3DNl16tmP1l3vV6JVAMpSBsJgVD" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;D:\\DIARY\\posttoday\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "D:\\DIARY\\posttoday\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\DIARY\posttoday\src\app" />
@@ -55,6 +94,7 @@
       <workItem from="1778199334544" duration="7566000" />
       <workItem from="1778228570556" duration="636000" />
       <workItem from="1778229698494" duration="365000" />
+      <workItem from="1778250320696" duration="17342000" />
     </task>
     <servers />
   </component>
