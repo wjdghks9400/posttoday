@@ -2,7 +2,6 @@ import Link from "next/link";
 import Container from "@/components/layout/Container";
 import EventCard from "@/components/event/EventCard";
 import SearchBox from "@/components/search/SearchBox";
-import AdPlaceholder from "@/components/common/AdPlaceholder";
 import { getHomeDataFromDb } from "@/lib/db/home";
 import { getTodayLabel } from "@/lib/date";
 import {
@@ -117,7 +116,7 @@ export default async function HomePage() {
                 </p>
 
                 <h1 className="max-w-4xl text-4xl font-black tracking-tight text-gray-950 md:text-6xl">
-                  오늘의 생일
+                  오늘의 생일·사건·밈
                 </h1>
 
                 <p className="mt-5 max-w-2xl text-base leading-7 text-gray-600 md:text-lg">
@@ -236,10 +235,6 @@ export default async function HomePage() {
               </section>
           )}
 
-          <div className="mt-10">
-            <AdPlaceholder label="메인 중단 광고 영역" size="wide" />
-          </div>
-
           <section className="mt-14">
             <div className="mb-6 flex items-end justify-between gap-4">
               <div>
@@ -280,6 +275,27 @@ export default async function HomePage() {
               {recentEvents.map((event) => (
                   <EventCard key={event.id} event={event} />
               ))}
+            </div>
+          </section>
+
+          <section className="mt-14 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm font-bold text-gray-500">
+                  Advertising & Partnership
+                </p>
+                <h2 className="mt-2 text-xl font-black text-gray-950">
+                  팬덤 이벤트, 굿즈, 생일카페, 콘텐츠 도구 광고를 문의할 수 있습니다.
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-gray-500">
+                  메인 화면에는 강한 광고를 배치하지 않고, 상세 페이지 중심으로
+                  제휴 광고를 검토합니다.
+                </p>
+              </div>
+
+              <Link href="/advertise" className="btn-secondary shrink-0">
+                광고/제휴 문의
+              </Link>
             </div>
           </section>
         </Container>

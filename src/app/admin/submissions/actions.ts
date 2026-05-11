@@ -8,7 +8,6 @@ import {
     EventType,
     SourceType,
     SubmissionStatus,
-    SubmissionType,
 } from "@prisma/client";
 
 const reviewableStatuses: SubmissionStatus[] = ["PENDING", "NEED_MORE"];
@@ -35,6 +34,14 @@ const eventCategories: EventCategory[] = [
     "ETC",
 ];
 
+function getAdminEventRedirectUrl(slug?: string | null) {
+    if (!slug) {
+        return "/admin/events";
+    }
+
+    return `/admin/events/${encodeURIComponent(slug)}`;
+}
+
 function revalidateAdminPaths(slug?: string | null) {
     revalidatePath("/");
     revalidatePath("/calendar");
@@ -44,8 +51,8 @@ function revalidateAdminPaths(slug?: string | null) {
     revalidatePath("/admin/submissions");
 
     if (slug) {
-        revalidatePath(`/events/${slug}`);
-        revalidatePath(`/admin/events/${slug}`);
+        revalidatePath(`/events/${encodeURIComponent(slug)}`);
+        revalidatePath(`/admin/events/${encodeURIComponent(slug)}`);
     }
 }
 
@@ -120,6 +127,7 @@ function toEventCategory(value: string | null): EventCategory {
 
     const koreanMap: Record<string, EventCategory> = {
         연예인: "CELEBRITY",
+        유명인: "CELEBRITY",
         인플루언서: "INFLUENCER",
         케이팝: "KPOP",
         "K-POP": "KPOP",
@@ -133,7 +141,10 @@ function toEventCategory(value: string | null): EventCategory {
         밈: "MEME",
         브랜드: "BRAND",
         역사: "HISTORY",
+        사건: "HISTORY",
         기타: "ETC",
+        생일: "ETC",
+        기념일: "ETC",
     };
 
     return koreanMap[text] ?? "ETC";
@@ -166,22 +177,6 @@ async function findTargetEventForSubmission(submission: {
     });
 }
 
-async function markSubmissionStatus(
-    submissionId: string,
-    status: SubmissionStatus
-) {
-    await prisma.submission.update({
-        where: {
-            id: submissionId,
-        },
-        data: {
-            status,
-        },
-    });
-
-    revalidateAdminPaths();
-}
-
 export async function approveSubmission(formData: FormData) {
     const submissionId = String(formData.get("submissionId") ?? "");
 
@@ -207,7 +202,19 @@ export async function approveSubmission(formData: FormData) {
 
     if (submission.type === "NEW_EVENT") {
         if (!submission.month || !submission.day) {
-            await markSubmissionStatus(submission.id, "REJECTED");
+            await prisma.submission.updateMany({
+                where: {
+                    id: submission.id,
+                    status: {
+                        in: reviewableStatuses,
+                    },
+                },
+                data: {
+                    status: "REJECTED",
+                },
+            });
+
+            revalidateAdminPaths();
             redirect("/admin/submissions");
         }
 
@@ -249,7 +256,7 @@ export async function approveSubmission(formData: FormData) {
                     type: eventType,
                     category,
                     description: cleanDescription || submission.description,
-                    contentIdea: null,
+                    contentIdea: "",
                     trustLevel: submission.sourceUrl
                         ? "SOURCE_VERIFIED"
                         : "COMMUNITY",
@@ -274,7 +281,7 @@ export async function approveSubmission(formData: FormData) {
 
         if (event) {
             revalidateAdminPaths(event.slug);
-            redirectUrl = `/admin/events/${event.slug}`;
+            redirectUrl = getAdminEventRedirectUrl(event.slug);
         }
     }
 
@@ -298,34 +305,38 @@ export async function approveSubmission(formData: FormData) {
                 return;
             }
 
-            if (targetEvent && submission.sourceUrl) {
-                const existingSource = await tx.source.findFirst({
-                    where: {
+            if (!targetEvent || !submission.sourceUrl) {
+                return;
+            }
+
+            const existingSource = await tx.source.findFirst({
+                where: {
+                    eventId: targetEvent.id,
+                    url: submission.sourceUrl,
+                },
+                select: {
+                    id: true,
+                },
+            });
+
+            if (!existingSource) {
+                await tx.source.create({
+                    data: {
                         eventId: targetEvent.id,
+                        title: "추가 출처",
                         url: submission.sourceUrl,
-                    },
-                    select: {
-                        id: true,
+                        type: getSourceType(),
+                        verified: true,
                     },
                 });
-
-                if (!existingSource) {
-                    await tx.source.create({
-                        data: {
-                            eventId: targetEvent.id,
-                            title: "추가 출처",
-                            url: submission.sourceUrl,
-                            type: getSourceType(),
-                            verified: true,
-                        },
-                    });
-                }
             }
         });
 
         if (targetEvent) {
             revalidateAdminPaths(targetEvent.slug);
-            redirectUrl = `/admin/events/${targetEvent.slug}`;
+            redirectUrl = getAdminEventRedirectUrl(targetEvent.slug);
+        } else {
+            revalidateAdminPaths();
         }
     }
 
@@ -346,7 +357,7 @@ export async function approveSubmission(formData: FormData) {
 
         if (targetEvent) {
             revalidateAdminPaths(targetEvent.slug);
-            redirectUrl = `/admin/events/${targetEvent.slug}`;
+            redirectUrl = getAdminEventRedirectUrl(targetEvent.slug);
         } else {
             revalidateAdminPaths();
         }
@@ -369,7 +380,7 @@ export async function approveSubmission(formData: FormData) {
 
         if (targetEvent) {
             revalidateAdminPaths(targetEvent.slug);
-            redirectUrl = `/admin/events/${targetEvent.slug}`;
+            redirectUrl = getAdminEventRedirectUrl(targetEvent.slug);
         } else {
             revalidateAdminPaths();
         }
@@ -431,7 +442,7 @@ export async function deleteSubmission(formData: FormData) {
         redirect("/admin/submissions");
     }
 
-    await prisma.submission.delete({
+    await prisma.submission.deleteMany({
         where: {
             id: submissionId,
         },
