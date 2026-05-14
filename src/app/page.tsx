@@ -116,7 +116,7 @@ export default async function HomePage() {
                 </p>
 
                 <h1 className="max-w-4xl text-4xl font-black tracking-tight text-gray-950 md:text-6xl">
-                  오늘의 생일·사건·밈
+                  오늘의 이벤트
                 </h1>
 
                 <p className="mt-5 max-w-2xl text-base leading-7 text-gray-600 md:text-lg">

@@ -1,55 +1,90 @@
-import Container from "@/components/layout/Container";
 import { loginAdmin } from "./actions";
 
-interface AdminLoginPageProps {
+type AdminLoginPageProps = {
     searchParams: Promise<{
         error?: string;
+        next?: string;
     }>;
+};
+
+function getSafeNextUrl(next?: string) {
+    if (!next) {
+        return "/admin";
+    }
+
+    if (!next.startsWith("/admin")) {
+        return "/admin";
+    }
+
+    if (next.startsWith("/admin/login")) {
+        return "/admin";
+    }
+
+    return next;
 }
 
 export default async function AdminLoginPage({
                                                  searchParams,
                                              }: AdminLoginPageProps) {
-    const { error } = await searchParams;
+    const params = await searchParams;
+
+    const error = params.error;
+    const nextUrl = getSafeNextUrl(params.next);
 
     return (
-        <main className="min-h-screen bg-gray-50">
-            <Container className="flex min-h-screen items-center justify-center py-12">
-                <form
-                    action={loginAdmin}
-                    className="w-full max-w-md rounded-3xl border border-gray-100 bg-white p-8 shadow-sm"
-                >
-                    <p className="mb-2 text-sm font-semibold text-gray-500">Admin</p>
-                    <h1 className="text-2xl font-black text-gray-950">관리자 로그인</h1>
-                    <p className="mt-2 text-sm leading-6 text-gray-500">
-                        제보 검수와 소재 관리는 관리자만 접근할 수 있습니다.
+        <main className="min-h-screen bg-neutral-50 px-4 py-16">
+            <section className="mx-auto max-w-sm rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <div className="mb-6">
+                    <p className="text-sm text-neutral-500">Posttoday Admin</p>
+                    <h1 className="mt-1 text-2xl font-semibold text-neutral-950">
+                        관리자 로그인
+                    </h1>
+                    <p className="mt-2 text-sm leading-6 text-neutral-500">
+                        관리자 비밀번호를 입력하면 관리 페이지로 이동합니다.
                     </p>
+                </div>
 
-                    {error && (
-                        <div className="mt-5 rounded-2xl bg-red-50 p-4 text-sm font-medium text-red-700">
-                            비밀번호가 올바르지 않습니다.
-                        </div>
-                    )}
+                <form action={loginAdmin} className="space-y-4">
+                    <input type="hidden" name="next" value={nextUrl} />
 
-                    <div className="mt-6">
-                        <label className="mb-2 block text-sm font-bold text-gray-700">
-                            관리자 비밀번호
+                    <div>
+                        <label
+                            htmlFor="password"
+                            className="mb-2 block text-sm font-medium text-neutral-700"
+                        >
+                            비밀번호
                         </label>
                         <input
+                            id="password"
                             name="password"
                             type="password"
-                            className="h-12 w-full rounded-2xl border border-gray-200 px-4 text-sm outline-none focus:border-black"
+                            required
+                            autoComplete="current-password"
+                            className="w-full rounded-2xl border border-neutral-200 px-4 py-3 text-sm outline-none transition focus:border-neutral-950"
+                            placeholder="관리자 비밀번호"
                         />
                     </div>
 
+                    {error === "invalid" ? (
+                        <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
+                            비밀번호가 올바르지 않습니다.
+                        </p>
+                    ) : null}
+
+                    {error === "config" ? (
+                        <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
+                            관리자 환경변수가 설정되지 않았습니다.
+                        </p>
+                    ) : null}
+
                     <button
                         type="submit"
-                        className="mt-6 h-12 w-full rounded-2xl bg-black text-sm font-bold text-white transition hover:bg-gray-800"
+                        className="w-full rounded-2xl bg-neutral-950 px-4 py-3 text-sm font-medium text-white transition hover:bg-neutral-800"
                     >
                         로그인
                     </button>
                 </form>
-            </Container>
+            </section>
         </main>
     );
 }

@@ -5,7 +5,7 @@ import SectionTitle from "@/components/common/SectionTitle";
 import { getCalendarDaysFromDb } from "@/lib/db/events";
 
 export const metadata: Metadata = {
-    title: "콘텐츠 캘린더 - 오늘뭐올리지",
+    title: "이벤트 캘린더 - 오늘뭐올리지",
     description:
         "월간 달력으로 생일, 기념일, 밈, 팬덤 이벤트를 한눈에 확인하세요.",
 };
@@ -23,7 +23,7 @@ export default async function CalendarPage() {
             <Container className="py-12">
                 <SectionTitle
                     eyebrow="Calendar"
-                    title={`${month}월 콘텐츠 캘린더`}
+                    title={`${month}월 이벤트 캘린더`}
                     description="날짜별 생일, 기념일, 밈, 팬덤 이벤트를 월간 달력으로 확인하세요."
                 />
 

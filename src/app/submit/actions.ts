@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { isValidMonthDay } from "@/lib/date";
 import { EventCategory, EventType, SubmissionType } from "@prisma/client";
-
 export interface SubmitState {
     ok: boolean;
     message: string;
@@ -81,12 +81,12 @@ function validateTitle(title: string) {
 }
 
 function validateDate(month: number | null, day: number | null) {
-    if (month === null || month < 1 || month > 12) {
-        return "월은 1부터 12 사이로 입력해주세요.";
+    if (month === null || day === null) {
+        return "날짜를 입력해주세요.";
     }
 
-    if (day === null || day < 1 || day > 31) {
-        return "일은 1부터 31 사이로 입력해주세요.";
+    if (!isValidMonthDay(month, day)) {
+        return "올바른 날짜를 입력해주세요.";
     }
 
     return null;

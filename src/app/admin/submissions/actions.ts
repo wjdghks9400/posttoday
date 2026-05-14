@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { isValidMonthDay } from "@/lib/date";
+import { requireAdmin } from "@/lib/admin-auth";
 import {
     EventCategory,
     EventType,
@@ -163,6 +165,10 @@ async function findTargetEventForSubmission(submission: {
         return null;
     }
 
+    if (!isValidMonthDay(submission.month, submission.day)) {
+        return null;
+    }
+
     return prisma.event.findFirst({
         where: {
             title: submission.title,
@@ -178,6 +184,8 @@ async function findTargetEventForSubmission(submission: {
 }
 
 export async function approveSubmission(formData: FormData) {
+    await requireAdmin();
+
     const submissionId = String(formData.get("submissionId") ?? "");
 
     if (!submissionId) {
@@ -201,7 +209,11 @@ export async function approveSubmission(formData: FormData) {
     let redirectUrl = "/admin/submissions";
 
     if (submission.type === "NEW_EVENT") {
-        if (!submission.month || !submission.day) {
+        if (
+            !submission.month ||
+            !submission.day ||
+            !isValidMonthDay(submission.month, submission.day)
+        ) {
             await prisma.submission.updateMany({
                 where: {
                     id: submission.id,
@@ -390,6 +402,8 @@ export async function approveSubmission(formData: FormData) {
 }
 
 export async function holdSubmission(formData: FormData) {
+    await requireAdmin();
+
     const submissionId = String(formData.get("submissionId") ?? "");
 
     if (!submissionId) {
@@ -412,6 +426,8 @@ export async function holdSubmission(formData: FormData) {
 }
 
 export async function rejectSubmission(formData: FormData) {
+    await requireAdmin();
+
     const submissionId = String(formData.get("submissionId") ?? "");
 
     if (!submissionId) {
@@ -436,6 +452,8 @@ export async function rejectSubmission(formData: FormData) {
 }
 
 export async function deleteSubmission(formData: FormData) {
+    await requireAdmin();
+
     const submissionId = String(formData.get("submissionId") ?? "");
 
     if (!submissionId) {
