@@ -161,7 +161,7 @@ async function findTargetEventForSubmission(submission: {
     month: number | null;
     day: number | null;
 }) {
-    if (!submission.month || !submission.day) {
+    if (submission.month === null || submission.day === null) {
         return null;
     }
 
@@ -210,8 +210,8 @@ export async function approveSubmission(formData: FormData) {
 
     if (submission.type === "NEW_EVENT") {
         if (
-            !submission.month ||
-            !submission.day ||
+            submission.month === null ||
+            submission.day === null ||
             !isValidMonthDay(submission.month, submission.day)
         ) {
             await prisma.submission.updateMany({
@@ -230,16 +230,15 @@ export async function approveSubmission(formData: FormData) {
             redirect("/admin/submissions");
         }
 
+        const month = submission.month;
+        const day = submission.day;
+
         const { eventType, cleanDescription } = parseEventTypeFromDescription(
             submission.description
         );
 
         const category = toEventCategory(submission.category);
-        const slug = await createUniqueSlug(
-            submission.title,
-            submission.month,
-            submission.day
-        );
+        const slug = await createUniqueSlug(submission.title, month, day);
 
         const event = await prisma.$transaction(async (tx) => {
             const updateResult = await tx.submission.updateMany({
@@ -262,8 +261,8 @@ export async function approveSubmission(formData: FormData) {
                 data: {
                     title: submission.title,
                     slug,
-                    month: submission.month,
-                    day: submission.day,
+                    month,
+                    day,
                     year: null,
                     type: eventType,
                     category,

@@ -1,57 +1,39 @@
-"use client";
-
-import { useTransition } from "react";
-import Link from "next/link";
-import { EventStatus } from "@prisma/client";
-import { updateEventStatus } from "@/app/admin/events/actions";
+import { hideEvent, publishEvent } from "@/app/admin/events/actions";
 
 interface EventAdminButtonsProps {
     eventId: string;
-    slug: string;
-    status: EventStatus;
+    status: "DRAFT" | "PUBLISHED" | "HIDDEN";
 }
 
 export default function EventAdminButtons({
                                               eventId,
-                                              slug,
                                               status,
                                           }: EventAdminButtonsProps) {
-    const [isPending, startTransition] = useTransition();
-
     return (
-        <div className="flex gap-2">
-            <Link
-                href={`/events/${slug}`}
-                className="rounded-xl bg-gray-100 px-3 py-2 text-xs font-bold text-gray-700"
-            >
-                보기
-            </Link>
+        <div className="flex items-center gap-2">
+            {status !== "PUBLISHED" ? (
+                <form action={publishEvent}>
+                    <input type="hidden" name="eventId" value={eventId} />
+                    <button
+                        type="submit"
+                        className="rounded-full bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800"
+                    >
+                        공개
+                    </button>
+                </form>
+            ) : null}
 
-            {status === "PUBLISHED" ? (
-                <button
-                    disabled={isPending}
-                    onClick={() => {
-                        startTransition(() => {
-                            updateEventStatus(eventId, "HIDDEN");
-                        });
-                    }}
-                    className="rounded-xl bg-black px-3 py-2 text-xs font-bold text-white disabled:bg-gray-400"
-                >
-                    숨김
-                </button>
-            ) : (
-                <button
-                    disabled={isPending}
-                    onClick={() => {
-                        startTransition(() => {
-                            updateEventStatus(eventId, "PUBLISHED");
-                        });
-                    }}
-                    className="rounded-xl bg-black px-3 py-2 text-xs font-bold text-white disabled:bg-gray-400"
-                >
-                    공개
-                </button>
-            )}
+            {status !== "HIDDEN" ? (
+                <form action={hideEvent}>
+                    <input type="hidden" name="eventId" value={eventId} />
+                    <button
+                        type="submit"
+                        className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-200"
+                    >
+                        숨김
+                    </button>
+                </form>
+            ) : null}
         </div>
     );
 }

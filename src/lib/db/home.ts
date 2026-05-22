@@ -1,77 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { CalendarEvent } from "@/types/event";
+import { Prisma } from "@prisma/client";
 
-type PrismaEventWithRelations = {
-    id: string;
-    title: string;
-    slug: string;
-    month: number;
-    day: number;
-    year: number | null;
-    type: string;
-    category: string;
-    description: string;
-    contentIdea: string;
-    trustLevel: string;
-    sources: {
-        id: string;
-        title: string;
-        url: string;
-        type: string;
-    }[];
-    tags: {
-        tag: {
-            name: string;
+type PrismaEventWithRelations = Prisma.EventGetPayload<{
+    include: {
+        sources: true;
+        tags: {
+            include: {
+                tag: true;
+            };
         };
-    }[];
-};
-
-function mapEventType(type: string): CalendarEvent["type"] {
-    return type as CalendarEvent["type"];
-}
-
-function mapCategory(category: string): CalendarEvent["category"] {
-    const categoryMap: Record<string, CalendarEvent["category"]> = {
-        CELEBRITY: "celebrity",
-        INFLUENCER: "influencer",
-        KPOP: "kpop",
-        ESPORTS: "esports",
-        GAME: "game",
-        ANIME: "anime",
-        MEME: "meme",
-        BRAND: "brand",
-        HISTORY: "history",
-        ETC: "etc",
     };
-
-    return categoryMap[category] ?? "etc";
-}
-
-function mapTrustLevel(trustLevel: string): CalendarEvent["trustLevel"] {
-    const trustLevelMap: Record<string, CalendarEvent["trustLevel"]> = {
-        OFFICIAL: "OFFICIAL",
-        SOURCE_VERIFIED: "SOURCE_VERIFIED",
-        COMMUNITY: "COMMUNITY",
-        UNCERTAIN: "UNCERTAIN",
-    };
-
-    return trustLevelMap[trustLevel] ?? "UNCERTAIN";
-}
-
-function mapSourceType(
-    sourceType: string
-): CalendarEvent["sources"][number]["type"] {
-    const sourceTypeMap: Record<string, CalendarEvent["sources"][number]["type"]> =
-        {
-            OFFICIAL: "official",
-            NEWS: "news",
-            WIKI: "wiki",
-            COMMUNITY: "community",
-            SNS: "sns",
-        };
-
-    return sourceTypeMap[sourceType] ?? "wiki";
-}
+}>;
 
 function mapEvent(event: PrismaEventWithRelations): CalendarEvent {
     return {
@@ -81,17 +21,18 @@ function mapEvent(event: PrismaEventWithRelations): CalendarEvent {
         month: event.month,
         day: event.day,
         year: event.year ?? undefined,
-        type: mapEventType(event.type),
-        category: mapCategory(event.category),
+        type: event.type as CalendarEvent["type"],
+        category: event.category as CalendarEvent["category"],
         description: event.description,
-        contentIdea: event.contentIdea,
-        trustLevel: mapTrustLevel(event.trustLevel),
+        contentIdea: event.contentIdea ?? "",
+        trustLevel: event.trustLevel as CalendarEvent["trustLevel"],
         tags: event.tags.map((item) => item.tag.name),
         sources: event.sources.map((source) => ({
             id: source.id,
             title: source.title,
             url: source.url,
-            type: mapSourceType(source.type),
+            type: source.type as CalendarEvent["sources"][number]["type"],
+            verified: source.verified,
         })),
     };
 }
@@ -102,7 +43,11 @@ function getDayOfYear(month: number, day: number) {
     return monthDays.slice(0, month - 1).reduce((sum, value) => sum + value, 0) + day;
 }
 
-function getDistanceFromToday(event: PrismaEventWithRelations, month: number, day: number) {
+function getDistanceFromToday(
+    event: PrismaEventWithRelations,
+    month: number,
+    day: number
+) {
     const todayValue = getDayOfYear(month, day);
     const eventValue = getDayOfYear(event.month, event.day);
 

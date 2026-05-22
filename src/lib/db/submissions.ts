@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma, SubmissionStatus } from "@prisma/client";
 
 export type SubmissionFilter =
     | "active"
@@ -8,31 +9,44 @@ export type SubmissionFilter =
     | "approved"
     | "rejected";
 
+function getSubmissionWhere(filter: SubmissionFilter): Prisma.SubmissionWhereInput {
+    if (filter === "active") {
+        return {
+            status: {
+                in: ["PENDING", "NEED_MORE"] satisfies SubmissionStatus[],
+            },
+        };
+    }
+
+    if (filter === "pending") {
+        return {
+            status: "PENDING",
+        };
+    }
+
+    if (filter === "need_more") {
+        return {
+            status: "NEED_MORE",
+        };
+    }
+
+    if (filter === "approved") {
+        return {
+            status: "APPROVED",
+        };
+    }
+
+    if (filter === "rejected") {
+        return {
+            status: "REJECTED",
+        };
+    }
+
+    return {};
+}
+
 export async function getSubmissionsFromDb(filter: SubmissionFilter = "active") {
-    const where =
-        filter === "active"
-            ? {
-                status: {
-                    in: ["PENDING", "NEED_MORE"] as const,
-                },
-            }
-            : filter === "pending"
-                ? {
-                    status: "PENDING" as const,
-                }
-                : filter === "need_more"
-                    ? {
-                        status: "NEED_MORE" as const,
-                    }
-                    : filter === "approved"
-                        ? {
-                            status: "APPROVED" as const,
-                        }
-                        : filter === "rejected"
-                            ? {
-                                status: "REJECTED" as const,
-                            }
-                            : {};
+    const where = getSubmissionWhere(filter);
 
     const submissions = await prisma.submission.findMany({
         where,
