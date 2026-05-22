@@ -8,13 +8,16 @@ export default function Header() {
                 <div className="flex h-16 items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-black text-sm font-bold text-white">
-                            P
+                            T
                         </div>
+
                         <div>
                             <div className="text-base font-bold tracking-tight">
-                                오늘뭐올리지
+                                TadayLab
                             </div>
-                            <div className="text-xs text-gray-500">콘텐츠 소재 캘린더</div>
+                            <div className="text-xs text-gray-500">
+                                생일·기념일 검색 캘린더
+                            </div>
                         </div>
                     </Link>
 

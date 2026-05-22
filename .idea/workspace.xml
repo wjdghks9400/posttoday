@@ -5,14 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="21c0c601-302c-4571-adea-c09605ca20bd" name="변경" comment="">
-      <change afterPath="$PROJECT_DIR$/src/app/advertise/actions.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/advertise/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/admin/submissions/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/admin/submissions/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/calendar/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/calendar/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/date/[month]/[day]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/date/[month]/[day]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/events/[slug]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/events/[slug]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/common/AdPlaceholder.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/AdPlaceholder.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/search/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/search/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/layout/Footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/layout/Footer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/layout/Header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/layout/Header.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

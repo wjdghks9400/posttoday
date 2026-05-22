@@ -15,6 +15,7 @@ import {
     eventTypeEmojiMap,
     eventTypeLabelMap,
 } from "@/lib/event-options";
+import { CalendarEvent } from "@/types/event";
 
 interface EventDetailPageProps {
     params: Promise<{
@@ -32,16 +33,63 @@ function safeDecodeSlug(slug: string) {
     }
 }
 
+function getEventSeoTitle(event: CalendarEvent) {
+    const dateLabel = formatMonthDay(event.month, event.day);
+
+    if (event.type === "BIRTHDAY") {
+        return `${event.title} 생일 - ${dateLabel}`;
+    }
+
+    if (event.type === "ANNIVERSARY") {
+        return `${event.title} 기념일 - ${dateLabel}`;
+    }
+
+    if (event.type === "HISTORY") {
+        return `${event.title} - ${dateLabel} 역사적 사건`;
+    }
+
+    return `${event.title} - ${dateLabel}`;
+}
+
+function getEventSeoDescription(event: CalendarEvent) {
+    const dateLabel = formatMonthDay(event.month, event.day);
+    const categoryLabel = calendarEventCategoryLabelMap[event.category];
+    const typeLabel = eventTypeLabelMap[event.type];
+
+    return `${event.title}의 날짜는 ${dateLabel}입니다. ${categoryLabel} 분야의 ${typeLabel} 정보를 TadayLab에서 확인하세요.`;
+}
+
 export async function generateMetadata({
                                            params,
                                        }: EventDetailPageProps): Promise<Metadata> {
     const { slug } = await params;
     const decodedSlug = safeDecodeSlug(slug);
 
+    const event = await getEventBySlugFromDb(decodedSlug);
+
+    if (!event) {
+        return {
+            title: "생일·기념일 정보",
+            description:
+                "TadayLab에서 날짜별 생일, 기념일, 역사적 사건 정보를 검색하세요.",
+        };
+    }
+
+    const title = getEventSeoTitle(event);
+    const description = getEventSeoDescription(event);
+
     return {
-        title: `${decodedSlug} - 오늘뭐올리지`,
-        description:
-            "오늘 날짜의 생일, 사건, 역사, 밈, 팬덤 이벤트를 확인해보세요.",
+        title,
+        description,
+        alternates: {
+            canonical: `/events/${event.slug}`,
+        },
+        openGraph: {
+            title: `${title} | TadayLab`,
+            description,
+            url: `/events/${event.slug}`,
+            type: "article",
+        },
     };
 }
 
@@ -59,15 +107,50 @@ export default async function EventDetailPage({
 
     const relatedEvents = await getRelatedEventsFromDb(decodedSlug);
 
+    const dateLabel = formatMonthDay(event.month, event.day);
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tadaylab.today";
+    const pageUrl = `${siteUrl}/events/${event.slug}`;
+
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: getEventSeoTitle(event),
+        description: getEventSeoDescription(event),
+        url: pageUrl,
+        inLanguage: "ko-KR",
+        mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": pageUrl,
+        },
+        about: [
+            event.title,
+            dateLabel,
+            eventTypeLabelMap[event.type],
+            calendarEventCategoryLabelMap[event.category],
+        ],
+        isPartOf: {
+            "@type": "WebSite",
+            name: "TadayLab",
+            url: siteUrl,
+        },
+    };
+
     return (
         <main className="min-h-screen bg-gray-50">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(jsonLd),
+                }}
+            />
+
             <section className="border-b border-gray-100 bg-white">
                 <Container className="py-10 md:py-14">
                     <Link
-                        href="/"
+                        href={`/date/${event.month}/${event.day}`}
                         className="mb-8 inline-flex text-sm font-semibold text-gray-500 hover:text-black"
                     >
-                        ← 오늘 항목으로 돌아가기
+                        ← {dateLabel} 생일·기념일로 돌아가기
                     </Link>
 
                     <div className="grid gap-8 lg:grid-cols-[1fr_320px] lg:items-start">
@@ -86,7 +169,11 @@ export default async function EventDetailPage({
                             </div>
 
                             <h1 className="text-4xl font-black tracking-tight text-gray-950 md:text-5xl">
-                                {event.title}
+                                {event.type === "BIRTHDAY"
+                                    ? `${event.title} 생일`
+                                    : event.type === "ANNIVERSARY"
+                                        ? `${event.title} 기념일`
+                                        : event.title}
                             </h1>
 
                             <p className="mt-5 max-w-3xl text-base leading-7 text-gray-600 md:text-lg">
@@ -100,7 +187,7 @@ export default async function EventDetailPage({
                             </p>
 
                             <p className="text-3xl font-black text-gray-950">
-                                {formatMonthDay(event.month, event.day)}
+                                {dateLabel}
                             </p>
 
                             {event.year && (
@@ -108,6 +195,13 @@ export default async function EventDetailPage({
                                     기준 연도: {event.year}년
                                 </p>
                             )}
+
+                            <Link
+                                href={`/date/${event.month}/${event.day}`}
+                                className="mt-5 inline-flex text-sm font-bold text-gray-950 hover:underline"
+                            >
+                                같은 날짜의 생일·기념일 보기 →
+                            </Link>
                         </aside>
                     </div>
                 </Container>
@@ -118,11 +212,11 @@ export default async function EventDetailPage({
                     <div className="space-y-6">
                         <section className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
                             <p className="mb-2 text-sm font-bold text-gray-500">
-                                기본 정보
+                                Basic Information
                             </p>
 
                             <h2 className="mb-5 text-2xl font-black text-gray-950">
-                                이 항목의 기본 정보
+                                {event.title} 날짜 정보
                             </h2>
 
                             <div className="grid gap-4 md:grid-cols-2">
@@ -130,8 +224,9 @@ export default async function EventDetailPage({
                                     <p className="text-sm font-bold text-gray-500">
                                         날짜
                                     </p>
+
                                     <p className="mt-2 text-lg font-black text-gray-950">
-                                        {formatMonthDay(event.month, event.day)}
+                                        {dateLabel}
                                     </p>
                                 </div>
 
@@ -139,6 +234,7 @@ export default async function EventDetailPage({
                                     <p className="text-sm font-bold text-gray-500">
                                         분류
                                     </p>
+
                                     <p className="mt-2 text-lg font-black text-gray-950">
                                         {eventTypeLabelMap[event.type]}
                                     </p>
@@ -148,6 +244,7 @@ export default async function EventDetailPage({
                                     <p className="text-sm font-bold text-gray-500">
                                         카테고리 / 분야
                                     </p>
+
                                     <p className="mt-2 text-lg font-black text-gray-950">
                                         {calendarEventCategoryLabelMap[event.category]}
                                     </p>
@@ -157,6 +254,7 @@ export default async function EventDetailPage({
                                     <p className="text-sm font-bold text-gray-500">
                                         출처 수
                                     </p>
+
                                     <p className="mt-2 text-lg font-black text-gray-950">
                                         {event.sources.length}개
                                     </p>
@@ -166,11 +264,11 @@ export default async function EventDetailPage({
 
                         <section className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
                             <p className="mb-2 text-sm font-bold text-gray-500">
-                                설명
+                                Description
                             </p>
 
                             <h2 className="mb-5 text-2xl font-black text-gray-950">
-                                항목 설명
+                                {event.title} 관련 정보
                             </h2>
 
                             <p className="text-sm leading-7 text-gray-600">
@@ -180,11 +278,11 @@ export default async function EventDetailPage({
 
                         <section className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
                             <p className="mb-2 text-sm font-bold text-gray-500">
-                                출처
+                                Sources
                             </p>
 
                             <h2 className="mb-5 text-2xl font-black text-gray-950">
-                                확인 가능한 자료
+                                {event.title} 출처
                             </h2>
 
                             {event.sources.length > 0 ? (
@@ -231,11 +329,11 @@ export default async function EventDetailPage({
 
                         <section className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
                             <p className="mb-2 text-sm font-bold text-gray-500">
-                                대표 이미지
+                                Image
                             </p>
 
                             <h2 className="mb-5 text-2xl font-black text-gray-950">
-                                이미지 영역
+                                {event.title} 이미지
                             </h2>
 
                             <div className="flex min-h-[240px] items-center justify-center rounded-3xl border border-dashed border-gray-200 bg-gray-50 p-8 text-center">
@@ -245,8 +343,9 @@ export default async function EventDetailPage({
                                     </p>
 
                                     <p className="mt-2 max-w-md text-sm leading-6 text-gray-400">
-                                        추후 관리자 화면에서 저작권 문제가 없는 이미지나 직접
-                                        제작한 이미지를 등록하는 방식으로 확장할 수 있습니다.
+                                        추후 관리자 화면에서 저작권 문제가 없는 이미지나
+                                        직접 제작한 이미지를 등록하는 방식으로 확장할 수
+                                        있습니다.
                                     </p>
                                 </div>
                             </div>
@@ -254,7 +353,7 @@ export default async function EventDetailPage({
 
                         <section className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
                             <p className="mb-2 text-sm font-bold text-gray-500">
-                                운영 정책
+                                Policy
                             </p>
 
                             <h2 className="mb-5 text-2xl font-black text-gray-950">
@@ -263,25 +362,26 @@ export default async function EventDetailPage({
 
                             <div className="space-y-4 text-sm leading-6 text-gray-600">
                                 <p>
-                                    오늘뭐올리지는 공개적으로 확인 가능한 생일, 사건, 역사,
-                                    기념일, 밈, 팬덤 이벤트 정보를 바탕으로 운영됩니다.
+                                    TadayLab은 공개적으로 확인 가능한 생일, 기념일,
+                                    역사적 사건, 출시일, 팬덤·브랜드 관련 날짜 정보를
+                                    바탕으로 운영됩니다.
                                 </p>
 
                                 <p>
-                                    비공개 개인정보, 추정 정보, 사적 정보는 등록하지 않는 것을
-                                    원칙으로 합니다.
+                                    비공개 개인정보, 추정 정보, 사적 정보는 등록하지 않는
+                                    것을 원칙으로 합니다.
                                 </p>
 
                                 <p>
-                                    사용자가 보낸 수정 제안과 출처 추가 요청은 관리자 검수 후
-                                    반영됩니다.
+                                    사용자가 보낸 수정 제안과 출처 추가 요청은 관리자 검수
+                                    후 반영됩니다.
                                 </p>
                             </div>
                         </section>
 
                         <section className="rounded-3xl border border-gray-100 bg-black p-6 shadow-sm">
                             <h2 className="text-2xl font-black text-white">
-                                이 정보가 틀렸나요?
+                                {event.title} 정보가 틀렸나요?
                             </h2>
 
                             <p className="mt-3 text-sm leading-6 text-gray-300">
@@ -310,17 +410,18 @@ export default async function EventDetailPage({
 
                     <aside className="space-y-5">
                         <section className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
-                            <p className="mb-4 text-sm font-bold text-gray-500">
+                            <h2 className="mb-4 text-sm font-bold text-gray-500">
                                 빠른 요약
-                            </p>
+                            </h2>
 
                             <div className="space-y-4">
                                 <div>
                                     <p className="text-xs font-bold text-gray-400">
                                         날짜
                                     </p>
+
                                     <p className="mt-1 font-black text-gray-950">
-                                        {formatMonthDay(event.month, event.day)}
+                                        {dateLabel}
                                     </p>
                                 </div>
 
@@ -328,6 +429,7 @@ export default async function EventDetailPage({
                                     <p className="text-xs font-bold text-gray-400">
                                         분류
                                     </p>
+
                                     <p className="mt-1 font-black text-gray-950">
                                         {eventTypeLabelMap[event.type]}
                                     </p>
@@ -337,6 +439,7 @@ export default async function EventDetailPage({
                                     <p className="text-xs font-bold text-gray-400">
                                         카테고리 / 분야
                                     </p>
+
                                     <p className="mt-1 font-black text-gray-950">
                                         {calendarEventCategoryLabelMap[event.category]}
                                     </p>
@@ -346,6 +449,7 @@ export default async function EventDetailPage({
                                     <p className="text-xs font-bold text-gray-400">
                                         신뢰도
                                     </p>
+
                                     <div className="mt-2">
                                         <TrustBadge trustLevel={event.trustLevel} />
                                     </div>
@@ -355,6 +459,7 @@ export default async function EventDetailPage({
                                     <p className="text-xs font-bold text-gray-400">
                                         출처 수
                                     </p>
+
                                     <p className="mt-1 font-black text-gray-950">
                                         {event.sources.length}개
                                     </p>
@@ -376,11 +481,12 @@ export default async function EventDetailPage({
                     <section className="mt-12">
                         <div className="mb-6">
                             <h2 className="text-2xl font-black text-gray-950">
-                                함께 보기 좋은 항목
+                                같은 날짜의 다른 생일·기념일
                             </h2>
 
                             <p className="mt-2 text-sm text-gray-500">
-                                같은 날짜나 비슷한 분야의 다른 항목입니다.
+                                {dateLabel} 또는 비슷한 분야의 다른 날짜 정보를 함께
+                                확인해보세요.
                             </p>
                         </div>
 
