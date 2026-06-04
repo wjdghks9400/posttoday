@@ -2,186 +2,344 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const seedEvents = [
-    {
-        title: "세계 웃음의 날",
-        slug: "world-laughter-day",
-        month: 5,
-        day: 7,
-        type: "ANNIVERSARY" as const,
-        category: "ETC" as const,
-        description: "웃음과 긍정적인 에너지를 나누자는 취지의 기념일입니다.",
-        contentIdea:
-            "직장인 공감 짤, 친구에게 보내는 유머 카드, 오늘 하루 웃겼던 순간을 숏폼이나 SNS 게시물로 만들기 좋아요.",
-        trustLevel: "SOURCE_VERIFIED" as const,
-        tags: ["기념일", "힐링", "SNS소재"],
-        sources: [
-            {
-                title: "기념일 소개 자료",
-                url: "https://example.com",
-                type: "WIKI" as const,
-                verified: true,
-            },
-        ],
-    },
-    {
-        title: "가상 아이돌 A 생일",
-        slug: "idol-a-birthday",
-        month: 5,
-        day: 7,
-        type: "BIRTHDAY" as const,
-        category: "KPOP" as const,
-        description:
-            "팬덤 사이에서 매년 축하 콘텐츠가 많이 올라오는 아이돌 생일입니다.",
-        contentIdea:
-            "생일 축하 이미지, 최애 무대 모음, 입덕 계기, 팬아트 리그램 콘텐츠로 활용할 수 있어요.",
-        trustLevel: "OFFICIAL" as const,
-        tags: ["KPOP", "생일", "팬덤"],
-        sources: [
-            {
-                title: "공식 프로필",
-                url: "https://example.com",
-                type: "OFFICIAL" as const,
-                verified: true,
-            },
-        ],
-    },
-    {
-        title: "인터넷 밈 다시 꺼내기 좋은 날",
-        slug: "meme-revival-day",
-        month: 5,
-        day: 7,
-        type: "MEME" as const,
-        category: "MEME" as const,
-        description:
-            "정확한 시작일은 불확실하지만, 커뮤니티에서 반복적으로 언급되는 밈 소재입니다.",
-        contentIdea:
-            "요즘 상황에 맞게 밈을 재해석하거나, 과거 유행과 현재를 비교하는 콘텐츠로 쓰기 좋아요.",
-        trustLevel: "COMMUNITY" as const,
-        tags: ["밈", "커뮤니티", "숏폼"],
-        sources: [
-            {
-                title: "커뮤니티 언급 자료",
-                url: "https://example.com",
-                type: "COMMUNITY" as const,
-                verified: false,
-            },
-        ],
-    },
-    {
-        title: "페이커 생일",
-        slug: "faker-birthday",
-        month: 5,
-        day: 7,
-        type: "BIRTHDAY" as const,
-        category: "ESPORTS" as const,
-        description:
-            "프로게이머 페이커의 생일입니다. 팬덤 사이에서 축하 게시물과 관련 콘텐츠가 자주 올라오는 소재입니다.",
-        contentIdea:
-            "페이커의 생일을 맞아 팬들이 기억하는 명장면, 우승 순간, 인상 깊었던 인터뷰를 모아 콘텐츠로 활용할 수 있어요.",
-        trustLevel: "SOURCE_VERIFIED" as const,
-        tags: ["e스포츠", "생일", "팬덤"],
-        sources: [
-            {
-                title: "공개 프로필 자료",
-                url: "https://example.com",
-                type: "WIKI" as const,
-                verified: true,
-            },
-        ],
-    },
-];
+type SeedCategory = "KPOP" | "CELEBRITY" | "ANIME";
 
-async function main() {
-    for (const item of seedEvents) {
-        const event = await prisma.event.upsert({
+type SeedItem = {
+    title: string;
+    slug: string;
+    month: number;
+    day: number;
+    year: number | null;
+    type: "BIRTHDAY";
+    category: SeedCategory;
+    description: string;
+    contentIdea: string;
+    trustLevel: "SOURCE_VERIFIED";
+    status: "PUBLISHED";
+    sourceTitle: string;
+    sourceUrl: string;
+    tags: string[];
+};
+
+type WikidataBinding = {
+    item: {
+        value: string;
+    };
+    itemLabel?: {
+        value: string;
+    };
+    birthDate?: {
+        value: string;
+    };
+};
+
+const WIKIDATA_ENDPOINT = "https://query.wikidata.org/sparql";
+
+function sanitizeSlugText(value: string) {
+    return value
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\p{L}\p{N}-]/gu, "")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+}
+
+function getWikidataId(url: string) {
+    return url.split("/").pop() ?? "unknown";
+}
+
+function createSlug(title: string, month: number, day: number, id: string) {
+    const base = sanitizeSlugText(title) || "event";
+    const safeId = sanitizeSlugText(id);
+
+    return `${base}-${month}-${day}-${safeId}`;
+}
+
+function parseDate(value: string) {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+
+    return {
+        year: date.getUTCFullYear(),
+        month: date.getUTCMonth() + 1,
+        day: date.getUTCDate(),
+    };
+}
+
+function uniqueByTitleAndDate(items: SeedItem[]) {
+    const seen = new Set<string>();
+
+    return items.filter((item) => {
+        const key = `${item.title}-${item.month}-${item.day}`;
+
+        if (seen.has(key)) {
+            return false;
+        }
+
+        seen.add(key);
+        return true;
+    });
+}
+
+async function fetchWikidata(query: string): Promise<WikidataBinding[]> {
+    const url = `${WIKIDATA_ENDPOINT}?query=${encodeURIComponent(
+        query
+    )}&format=json`;
+
+    const response = await fetch(url, {
+        headers: {
+            Accept: "application/sparql-results+json",
+            "User-Agent": "TadayLabSeed/1.0 (https://tadaylab.today)",
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Wikidata request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    return data.results.bindings as WikidataBinding[];
+}
+
+function toSeedItems(
+    bindings: WikidataBinding[],
+    options: {
+        category: SeedCategory;
+        limit: number;
+        description: (title: string) => string;
+        contentIdea: (title: string) => string;
+        tags: string[];
+    }
+): SeedItem[] {
+    const items: SeedItem[] = [];
+
+    for (const binding of bindings) {
+        const title = binding.itemLabel?.value?.trim();
+        const birthDate = binding.birthDate?.value;
+        const itemUrl = binding.item.value;
+
+        if (!title || !birthDate || !itemUrl) {
+            continue;
+        }
+
+        const parsedDate = parseDate(birthDate);
+
+        if (!parsedDate) {
+            continue;
+        }
+
+        const wikidataId = getWikidataId(itemUrl);
+
+        items.push({
+            title,
+            slug: createSlug(title, parsedDate.month, parsedDate.day, wikidataId),
+            month: parsedDate.month,
+            day: parsedDate.day,
+            year: parsedDate.year,
+            type: "BIRTHDAY",
+            category: options.category,
+            description: options.description(title),
+            contentIdea: options.contentIdea(title),
+            trustLevel: "SOURCE_VERIFIED",
+            status: "PUBLISHED",
+            sourceTitle: "Wikidata",
+            sourceUrl: itemUrl,
+            tags: options.tags,
+        });
+
+        if (items.length >= options.limit) {
+            break;
+        }
+    }
+
+    return uniqueByTitleAndDate(items).slice(0, options.limit);
+}
+
+async function getKpopLikeBirthdays() {
+    const query = `
+SELECT DISTINCT ?item ?itemLabel ?birthDate WHERE {
+  ?item wdt:P31 wd:Q5;
+        wdt:P569 ?birthDate;
+        wdt:P27 wd:Q884.
+  ?item wdt:P106 ?occupation.
+  VALUES ?occupation {
+    wd:Q177220
+    wd:Q639669
+    wd:Q36834
+    wd:Q10800557
+  }
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "ko,en".
+  }
+}
+ORDER BY ?birthDate ?itemLabel
+LIMIT 120
+`;
+
+    const bindings = await fetchWikidata(query);
+
+    return toSeedItems(bindings, {
+        category: "KPOP",
+        limit: 60,
+        description: (title) =>
+            `${title}의 생일입니다. Wikidata 기준 생년월일 정보를 바탕으로 등록된 항목입니다.`,
+        contentIdea: (title) =>
+            `${title} 생일에 맞춰 팬 콘텐츠, 생일 축하 게시물, 날짜 기반 검색 콘텐츠로 활용할 수 있습니다.`,
+        tags: ["생일", "아이돌", "KPOP"],
+    });
+}
+
+async function getKoreanActorBirthdays() {
+    const query = `
+SELECT DISTINCT ?item ?itemLabel ?birthDate WHERE {
+  ?item wdt:P31 wd:Q5;
+        wdt:P569 ?birthDate;
+        wdt:P27 wd:Q884;
+        wdt:P106 wd:Q33999.
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "ko,en".
+  }
+}
+ORDER BY ?birthDate ?itemLabel
+LIMIT 80
+`;
+
+    const bindings = await fetchWikidata(query);
+
+    return toSeedItems(bindings, {
+        category: "CELEBRITY",
+        limit: 30,
+        description: (title) =>
+            `${title}의 생일입니다. Wikidata 기준 생년월일 정보를 바탕으로 등록된 한국 배우 항목입니다.`,
+        contentIdea: (title) =>
+            `${title} 생일에 맞춰 배우 생일 콘텐츠, 작품 회고, 팬 게시물 소재로 활용할 수 있습니다.`,
+        tags: ["생일", "한국배우", "배우"],
+    });
+}
+
+async function getAnimeCharacterBirthdays() {
+    const query = `
+SELECT DISTINCT ?item ?itemLabel ?birthDate WHERE {
+  ?item wdt:P31/wdt:P279* wd:Q15773347;
+        wdt:P569 ?birthDate.
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "ko,en".
+  }
+}
+ORDER BY ?birthDate ?itemLabel
+LIMIT 40
+`;
+
+    const bindings = await fetchWikidata(query);
+
+    return toSeedItems(bindings, {
+        category: "ANIME",
+        limit: 10,
+        description: (title) =>
+            `${title}의 생일입니다. Wikidata 기준 생년월일 정보를 바탕으로 등록된 애니메이션 캐릭터 항목입니다.`,
+        contentIdea: (title) =>
+            `${title} 생일에 맞춰 캐릭터 생일 콘텐츠, 팬아트 주제, 날짜 기반 콘텐츠 소재로 활용할 수 있습니다.`,
+        tags: ["생일", "애니", "캐릭터"],
+    });
+}
+
+async function clearDatabase() {
+    await prisma.eventTag.deleteMany();
+    await prisma.source.deleteMany();
+    await prisma.tag.deleteMany();
+    await prisma.event.deleteMany();
+    await prisma.submission.deleteMany();
+}
+
+async function connectTags(eventId: string, tags: string[]) {
+    for (const tagName of tags) {
+        const tag = await prisma.tag.upsert({
             where: {
-                slug: item.slug,
+                name: tagName,
             },
-            update: {
-                title: item.title,
-                month: item.month,
-                day: item.day,
-                type: item.type,
-                category: item.category,
-                description: item.description,
-                contentIdea: item.contentIdea,
-                trustLevel: item.trustLevel,
-                status: "PUBLISHED",
-            },
+            update: {},
             create: {
-                title: item.title,
-                slug: item.slug,
-                month: item.month,
-                day: item.day,
-                type: item.type,
-                category: item.category,
-                description: item.description,
-                contentIdea: item.contentIdea,
-                trustLevel: item.trustLevel,
-                status: "PUBLISHED",
+                name: tagName,
             },
         });
 
-        await prisma.source.deleteMany({
-            where: {
-                eventId: event.id,
+        await prisma.eventTag.create({
+            data: {
+                eventId,
+                tagId: tag.id,
             },
         });
-
-        for (const source of item.sources) {
-            await prisma.source.create({
-                data: {
-                    eventId: event.id,
-                    title: source.title,
-                    url: source.url,
-                    type: source.type,
-                    verified: source.verified,
-                },
-            });
-        }
-
-        await prisma.eventTag.deleteMany({
-            where: {
-                eventId: event.id,
-            },
-        });
-
-        for (const tagName of item.tags) {
-            const tag = await prisma.tag.upsert({
-                where: {
-                    name: tagName,
-                },
-                update: {},
-                create: {
-                    name: tagName,
-                },
-            });
-
-            await prisma.eventTag.upsert({
-                where: {
-                    eventId_tagId: {
-                        eventId: event.id,
-                        tagId: tag.id,
-                    },
-                },
-                update: {},
-                create: {
-                    eventId: event.id,
-                    tagId: tag.id,
-                },
-            });
-        }
     }
 }
 
+async function createEvent(item: SeedItem) {
+    const event = await prisma.event.create({
+        data: {
+            title: item.title,
+            slug: item.slug,
+            month: item.month,
+            day: item.day,
+            year: item.year,
+            type: item.type,
+            category: item.category,
+            description: item.description,
+            contentIdea: item.contentIdea,
+            trustLevel: item.trustLevel,
+            status: item.status,
+            sources: {
+                create: {
+                    title: item.sourceTitle,
+                    url: item.sourceUrl,
+                    type: "WIKI",
+                    verified: true,
+                },
+            },
+        },
+    });
+
+    await connectTags(event.id, item.tags);
+}
+
+async function main() {
+    console.log("기존 DB 데이터를 삭제합니다.");
+    await clearDatabase();
+
+    console.log("Wikidata에서 실제 생일 데이터를 가져옵니다.");
+
+    const [idolBirthdays, actorBirthdays, animeBirthdays] = await Promise.all([
+        getKpopLikeBirthdays(),
+        getKoreanActorBirthdays(),
+        getAnimeCharacterBirthdays(),
+    ]);
+
+    const seedItems = [
+        ...idolBirthdays,
+        ...actorBirthdays,
+        ...animeBirthdays,
+    ];
+
+    console.log(`아이돌/가수 계열: ${idolBirthdays.length}개`);
+    console.log(`한국 배우: ${actorBirthdays.length}개`);
+    console.log(`애니 캐릭터: ${animeBirthdays.length}개`);
+    console.log(`총 ${seedItems.length}개 데이터를 등록합니다.`);
+
+    for (const item of seedItems) {
+        await createEvent(item);
+    }
+
+    console.log("Seed 완료");
+}
+
 main()
-    .then(async () => {
-        console.log("Seed completed");
-        await prisma.$disconnect();
-    })
-    .catch(async (error) => {
+    .catch((error) => {
         console.error(error);
-        await prisma.$disconnect();
         process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
     });

@@ -1,14 +1,23 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Container from "@/components/layout/Container";
 import EventList from "@/components/event/EventList";
 import { getEventsByDateFromDb } from "@/lib/db/events";
+import { isValidMonthDay } from "@/lib/date";
 
 interface DatePageProps {
     params: Promise<{
         month: string;
         day: string;
     }>;
+}
+
+const SITE_NAME = "TodayLab";
+const DEFAULT_SITE_URL = "https://todaylab.today";
+
+function getSiteUrl() {
+    return process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL;
 }
 
 function toDateNumbers(month: string, day: string) {
@@ -18,14 +27,58 @@ function toDateNumbers(month: string, day: string) {
     };
 }
 
+function getDateLabel(month: number, day: number) {
+    return `${month}월 ${day}일`;
+}
+
+function getDatePageTitle(month: number, day: number) {
+    const dateLabel = getDateLabel(month, day);
+
+    return `${dateLabel} 생일인 사람·연예인·기념일`;
+}
+
+function getDatePageDescription(month: number, day: number) {
+    const dateLabel = getDateLabel(month, day);
+
+    return `${dateLabel} 생일인 사람, 연예인, 아이돌, 인플루언서와 같은 날짜의 기념일·역사 정보를 확인하세요.`;
+}
+
+function getBirthdayNames(events: Awaited<ReturnType<typeof getEventsByDateFromDb>>) {
+    return events
+        .filter((event) => event.type === "BIRTHDAY")
+        .map((event) => event.title);
+}
+
+function getBirthdaySummary(month: number, day: number, names: string[]) {
+    const dateLabel = getDateLabel(month, day);
+
+    if (names.length === 0) {
+        return `${dateLabel}에 등록된 생일 정보는 아직 없습니다.`;
+    }
+
+    if (names.length <= 3) {
+        return `${dateLabel} 생일인 인물은 ${names.join(", ")}입니다.`;
+    }
+
+    return `${dateLabel} 생일인 인물은 ${names.slice(0, 3).join(", ")} 외 ${names.length - 3}명입니다.`;
+}
+
 export async function generateMetadata({
                                            params,
                                        }: DatePageProps): Promise<Metadata> {
     const { month, day } = await params;
     const { monthNumber, dayNumber } = toDateNumbers(month, day);
 
-    const title = `${monthNumber}월 ${dayNumber}일 생일·기념일`;
-    const description = `${monthNumber}월 ${dayNumber}일의 생일, 기념일, 역사적 사건, K-POP, 게임, 애니, 브랜드 관련 날짜 정보를 확인하세요.`;
+    if (!isValidMonthDay(monthNumber, dayNumber)) {
+        return {
+            title: `날짜 정보를 찾을 수 없습니다 | ${SITE_NAME}`,
+        };
+    }
+
+    const title = getDatePageTitle(monthNumber, dayNumber);
+    const description = getDatePageDescription(monthNumber, dayNumber);
+    const siteUrl = getSiteUrl();
+    const pageUrl = `${siteUrl}/date/${monthNumber}/${dayNumber}`;
 
     return {
         title,
@@ -34,10 +87,17 @@ export async function generateMetadata({
             canonical: `/date/${monthNumber}/${dayNumber}`,
         },
         openGraph: {
-            title: `${title} | TadayLab`,
+            title: `${title} | ${SITE_NAME}`,
             description,
-            url: `/date/${monthNumber}/${dayNumber}`,
+            url: pageUrl,
+            siteName: SITE_NAME,
             type: "website",
+            locale: "ko_KR",
+        },
+        twitter: {
+            card: "summary",
+            title: `${title} | ${SITE_NAME}`,
+            description,
         },
     };
 }
@@ -45,6 +105,11 @@ export async function generateMetadata({
 export default async function DatePage({ params }: DatePageProps) {
     const { month, day } = await params;
     const { monthNumber, dayNumber } = toDateNumbers(month, day);
+
+    if (!isValidMonthDay(monthNumber, dayNumber)) {
+        notFound();
+    }
+
     const events = await getEventsByDateFromDb(monthNumber, dayNumber);
 
     const birthdayEvents = events.filter((event) => event.type === "BIRTHDAY");
@@ -59,17 +124,34 @@ export default async function DatePage({ params }: DatePageProps) {
             event.type !== "HISTORY"
     );
 
+    const dateLabel = getDateLabel(monthNumber, dayNumber);
+    const birthdayNames = getBirthdayNames(events);
+    const birthdaySummary = getBirthdaySummary(
+        monthNumber,
+        dayNumber,
+        birthdayNames
+    );
+    const siteUrl = getSiteUrl();
+    const pageUrl = `${siteUrl}/date/${monthNumber}/${dayNumber}`;
+
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
-        name: `${monthNumber}월 ${dayNumber}일 생일·기념일`,
-        description: `${monthNumber}월 ${dayNumber}일의 생일, 기념일, 역사적 사건 정보를 모은 날짜별 컬렉션 페이지입니다.`,
-        url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://tadaylab.today"}/date/${monthNumber}/${dayNumber}`,
+        name: getDatePageTitle(monthNumber, dayNumber),
+        description: getDatePageDescription(monthNumber, dayNumber),
+        url: pageUrl,
+        inLanguage: "ko-KR",
         isPartOf: {
             "@type": "WebSite",
-            name: "TadayLab",
-            url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://tadaylab.today",
+            name: SITE_NAME,
+            url: siteUrl,
         },
+        about: [
+            `${dateLabel} 생일`,
+            `${dateLabel} 생일인 사람`,
+            `${dateLabel} 생일인 연예인`,
+            `${dateLabel} 기념일`,
+        ],
     };
 
     return (
@@ -89,55 +171,136 @@ export default async function DatePage({ params }: DatePageProps) {
                     ← 캘린더로 돌아가기
                 </Link>
 
-                <section className="mb-8">
+                <section className="mb-8 rounded-3xl border border-gray-100 bg-white p-7 shadow-sm md:p-9">
                     <p className="mb-2 text-sm font-semibold text-gray-500">
                         Date Archive
                     </p>
 
-                    <h1 className="text-3xl font-black tracking-tight text-gray-950">
-                        {monthNumber}월 {dayNumber}일 생일·기념일
+                    <h1 className="text-3xl font-black tracking-tight text-gray-950 md:text-4xl">
+                        {dateLabel} 생일인 사람·연예인·기념일
                     </h1>
 
-                    <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-500">
-                        {monthNumber}월 {dayNumber}일의 생일, 기념일, 역사적 사건,
-                        K-POP, 게임, 애니, 브랜드 관련 날짜 정보를 확인하세요.
+                    <p className="mt-4 max-w-3xl text-base leading-7 text-gray-600">
+                        {dateLabel} 생일인 사람, 연예인, 아이돌, 인플루언서와 같은
+                        날짜의 기념일·역사 정보를 확인하세요.
                     </p>
+
+                    <div className="mt-6 rounded-2xl bg-gray-50 p-5">
+                        <p className="text-sm font-bold text-gray-500">
+                            빠른 답변
+                        </p>
+
+                        <p className="mt-2 text-lg font-black leading-8 text-gray-950">
+                            {birthdaySummary}
+                        </p>
+                    </div>
+
+                    <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="rounded-2xl border border-gray-100 p-4">
+                            <p className="text-sm font-bold text-gray-500">
+                                생일
+                            </p>
+
+                            <p className="mt-2 text-2xl font-black text-gray-950">
+                                {birthdayEvents.length}
+                            </p>
+                        </div>
+
+                        <div className="rounded-2xl border border-gray-100 p-4">
+                            <p className="text-sm font-bold text-gray-500">
+                                기념일
+                            </p>
+
+                            <p className="mt-2 text-2xl font-black text-gray-950">
+                                {anniversaryEvents.length}
+                            </p>
+                        </div>
+
+                        <div className="rounded-2xl border border-gray-100 p-4">
+                            <p className="text-sm font-bold text-gray-500">
+                                역사/사건
+                            </p>
+
+                            <p className="mt-2 text-2xl font-black text-gray-950">
+                                {historyEvents.length}
+                            </p>
+                        </div>
+
+                        <div className="rounded-2xl border border-gray-100 p-4">
+                            <p className="text-sm font-bold text-gray-500">
+                                기타
+                            </p>
+
+                            <p className="mt-2 text-2xl font-black text-gray-950">
+                                {otherEvents.length}
+                            </p>
+                        </div>
+                    </div>
                 </section>
 
                 {events.length > 0 ? (
                     <div className="space-y-10">
                         {birthdayEvents.length > 0 && (
                             <section>
-                                <h2 className="mb-4 text-2xl font-black text-gray-950">
-                                    {monthNumber}월 {dayNumber}일 생일인 인물
-                                </h2>
+                                <div className="mb-4">
+                                    <h2 className="text-2xl font-black text-gray-950">
+                                        {dateLabel} 생일인 사람
+                                    </h2>
+
+                                    <p className="mt-2 text-sm leading-6 text-gray-500">
+                                        {dateLabel}에 생일로 등록된 인물 정보입니다.
+                                    </p>
+                                </div>
+
                                 <EventList events={birthdayEvents} />
                             </section>
                         )}
 
                         {anniversaryEvents.length > 0 && (
                             <section>
-                                <h2 className="mb-4 text-2xl font-black text-gray-950">
-                                    {monthNumber}월 {dayNumber}일 기념일
-                                </h2>
+                                <div className="mb-4">
+                                    <h2 className="text-2xl font-black text-gray-950">
+                                        {dateLabel} 기념일
+                                    </h2>
+
+                                    <p className="mt-2 text-sm leading-6 text-gray-500">
+                                        {dateLabel}에 등록된 기념일 정보입니다.
+                                    </p>
+                                </div>
+
                                 <EventList events={anniversaryEvents} />
                             </section>
                         )}
 
                         {historyEvents.length > 0 && (
                             <section>
-                                <h2 className="mb-4 text-2xl font-black text-gray-950">
-                                    {monthNumber}월 {dayNumber}일 역사적 사건
-                                </h2>
+                                <div className="mb-4">
+                                    <h2 className="text-2xl font-black text-gray-950">
+                                        {dateLabel} 역사적 사건
+                                    </h2>
+
+                                    <p className="mt-2 text-sm leading-6 text-gray-500">
+                                        {dateLabel}에 등록된 역사·사건 정보입니다.
+                                    </p>
+                                </div>
+
                                 <EventList events={historyEvents} />
                             </section>
                         )}
 
                         {otherEvents.length > 0 && (
                             <section>
-                                <h2 className="mb-4 text-2xl font-black text-gray-950">
-                                    {monthNumber}월 {dayNumber}일 게임·애니·브랜드 기념일
-                                </h2>
+                                <div className="mb-4">
+                                    <h2 className="text-2xl font-black text-gray-950">
+                                        {dateLabel} 기타 날짜 정보
+                                    </h2>
+
+                                    <p className="mt-2 text-sm leading-6 text-gray-500">
+                                        {dateLabel}에 등록된 게임, 애니, 브랜드, 밈, 팬덤
+                                        관련 날짜 정보입니다.
+                                    </p>
+                                </div>
+
                                 <EventList events={otherEvents} />
                             </section>
                         )}
