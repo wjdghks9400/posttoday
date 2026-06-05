@@ -25,6 +25,9 @@ export default function Header() {
                         <Link href="/" className="hover:text-black">
                             오늘
                         </Link>
+                        <Link href="/birthdays" className="hover:text-black">
+                            생일
+                        </Link>
                         <Link href="/calendar" className="hover:text-black">
                             캘린더
                         </Link>

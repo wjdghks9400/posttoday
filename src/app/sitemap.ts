@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getPublishedEvents } from "@/lib/db/events";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todaylab.today";
 
     const events = await getPublishedEvents();
 
@@ -15,6 +15,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
         {
             url: `${baseUrl}/calendar`,
+            lastModified: new Date(),
+            changeFrequency: "daily",
+            priority: 0.9,
+        },
+        {
+            url: `${baseUrl}/birthdays`,
             lastModified: new Date(),
             changeFrequency: "daily",
             priority: 0.9,
@@ -37,7 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${baseUrl}/events/${event.slug}`,
         lastModified: new Date(),
         changeFrequency: "monthly",
-        priority: 0.8,
+        priority: event.type === "BIRTHDAY" ? 0.85 : 0.8,
     }));
 
     const uniqueDateMap = new Map<string, { month: number; day: number }>();
@@ -59,5 +65,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         })
     );
 
-    return [...staticPages, ...eventPages, ...datePages];
+    const monthPages: MetadataRoute.Sitemap = Array.from(
+        { length: 12 },
+        (_, index) => ({
+            url: `${baseUrl}/date/${index + 1}`,
+            lastModified: new Date(),
+            changeFrequency: "monthly",
+            priority: 0.7,
+        })
+    );
+
+    return [...staticPages, ...monthPages, ...eventPages, ...datePages];
 }

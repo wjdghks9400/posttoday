@@ -1,68 +1,114 @@
+import { EventCategory, EventType, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { getPublishedEvents } from "@/lib/db/events";
 
-export async function searchEvents(query: string, category: string) {
+const eventTypes = [
+    "BIRTHDAY",
+    "ANNIVERSARY",
+    "MEME",
+    "FANDOM",
+    "HISTORY",
+    "BRAND",
+] as const;
+
+const eventCategories = [
+    "CELEBRITY",
+    "INFLUENCER",
+    "KPOP",
+    "ESPORTS",
+    "GAME",
+    "ANIME",
+    "MEME",
+    "BRAND",
+    "HISTORY",
+    "ETC",
+] as const;
+
+export interface SearchEventsParams {
+    query?: string;
+    type?: string;
+    category?: string;
+}
+
+function normalizeParam(value?: string) {
+    return value?.trim().toUpperCase() ?? "";
+}
+
+function isEventType(value: string): value is EventType {
+    return eventTypes.includes(value as EventType);
+}
+
+function isEventCategory(value: string): value is EventCategory {
+    return eventCategories.includes(value as EventCategory);
+}
+
+export async function searchEvents({
+                                       query = "",
+                                       type = "",
+                                       category = "",
+                                   }: SearchEventsParams) {
     const keyword = query.trim();
+    const normalizedType = normalizeParam(type);
+    const normalizedCategory = normalizeParam(category);
 
-    if (!keyword && category === "전체 카테고리") {
-        return getPublishedEvents();
+    const andConditions: Prisma.EventWhereInput[] = [];
+
+    if (keyword) {
+        andConditions.push({
+            OR: [
+                {
+                    title: {
+                        contains: keyword,
+                        mode: "insensitive",
+                    },
+                },
+                {
+                    description: {
+                        contains: keyword,
+                        mode: "insensitive",
+                    },
+                },
+                {
+                    contentIdea: {
+                        contains: keyword,
+                        mode: "insensitive",
+                    },
+                },
+                {
+                    tags: {
+                        some: {
+                            tag: {
+                                name: {
+                                    contains: keyword,
+                                    mode: "insensitive",
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+        });
     }
 
-    const categoryMap: Record<string, string> = {
-        생일: "CELEBRITY",
-        기념일: "ANNIVERSARY",
-        밈: "MEME",
-        팬덤: "KPOP",
-        브랜드: "BRAND",
-        역사: "HISTORY",
-    };
+    if (isEventType(normalizedType)) {
+        andConditions.push({
+            type: normalizedType,
+        });
+    }
+
+    if (isEventCategory(normalizedCategory)) {
+        andConditions.push({
+            category: normalizedCategory,
+        });
+    }
 
     const events = await prisma.event.findMany({
         where: {
             status: "PUBLISHED",
-            AND: [
-                keyword
-                    ? {
-                        OR: [
-                            {
-                                title: {
-                                    contains: keyword,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                description: {
-                                    contains: keyword,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                contentIdea: {
-                                    contains: keyword,
-                                    mode: "insensitive",
-                                },
-                            },
-                            {
-                                tags: {
-                                    some: {
-                                        tag: {
-                                            name: {
-                                                contains: keyword,
-                                                mode: "insensitive",
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                        ],
-                    }
-                    : {},
-                category !== "전체 카테고리" && categoryMap[category]
-                    ? {
-                        category: categoryMap[category] as never,
-                    }
-                    : {},
-            ],
+            ...(andConditions.length > 0
+                ? {
+                    AND: andConditions,
+                }
+                : {}),
         },
         include: {
             sources: true,
@@ -72,9 +118,17 @@ export async function searchEvents(query: string, category: string) {
                 },
             },
         },
-        orderBy: {
-            createdAt: "desc",
-        },
+        orderBy: [
+            {
+                month: "asc",
+            },
+            {
+                day: "asc",
+            },
+            {
+                title: "asc",
+            },
+        ],
     });
 
     return events.map((event) => ({
@@ -84,17 +138,18 @@ export async function searchEvents(query: string, category: string) {
         month: event.month,
         day: event.day,
         year: event.year ?? undefined,
-        type: event.type as never,
-        category: event.category.toLowerCase() as never,
+        type: event.type,
+        category: event.category.toLowerCase(),
         description: event.description,
-        contentIdea: event.contentIdea,
-        trustLevel: event.trustLevel as never,
+        contentIdea: event.contentIdea ?? "",
+        trustLevel: event.trustLevel,
         tags: event.tags.map((item) => item.tag.name),
         sources: event.sources.map((source) => ({
             id: source.id,
             title: source.title,
             url: source.url,
-            type: source.type.toLowerCase() as never,
+            type: source.type.toLowerCase(),
+            verified: source.verified,
         })),
     }));
 }
