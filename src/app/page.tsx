@@ -10,7 +10,8 @@ import {
   eventTypeLabelMap,
 } from "@/lib/event-options";
 import { CalendarEvent, CalendarEventType } from "@/types/event";
-
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export const metadata: Metadata = {
   title: "생일·기념일 검색 캘린더",
   description:
