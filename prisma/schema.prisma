@@ -86,6 +86,7 @@ model Event {
 
   sources     Source[]
   tags        EventTag[]
+  oneLines    OneLine[]
 
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -129,6 +130,26 @@ model EventTag {
   tag     Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([eventId, tagId])
+}
+
+model OneLine {
+  id        String    @id @default(cuid())
+  eventId   String
+  nickname  String?
+  body      String
+  ipHash    String?
+  userAgent String?
+  deletedAt DateTime?
+
+  event     Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([eventId])
+  @@index([ipHash])
+  @@index([createdAt])
+  @@index([deletedAt])
 }
 
 model Submission {

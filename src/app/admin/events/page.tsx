@@ -77,6 +77,10 @@ export default async function AdminEventsPage() {
                             제보 검수로 이동
                         </Link>
 
+                        <Link href="/admin/one-lines" className="btn-secondary">
+                            한줄쓰기 관리
+                        </Link>
+
                         <Link href="/submit" className="btn-secondary">
                             사용자 제보 화면
                         </Link>

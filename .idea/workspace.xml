@@ -6,14 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="21c0c601-302c-4571-adea-c09605ca20bd" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/calendar/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/calendar/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/migrations/20260508152330_update_event_category/migration.sql" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/migrations/20260508152330_update_event_category/migration.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/migrations/migration_lock.toml" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/migrations/migration_lock.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/seed.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/admin/events/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/admin/events/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/admin/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/admin/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/date/[month]/[day]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/date/[month]/[day]/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/events/[slug]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/events/[slug]/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/search/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/search/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/layout/Footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/layout/Footer.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/layout/Header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/layout/Header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/db/admin.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/admin.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +45,7 @@
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/sideProject/ddalkkak_V1/fe2&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -79,6 +83,7 @@
       <workItem from="1779414158239" duration="3126000" />
       <workItem from="1779435779719" duration="2405000" />
       <workItem from="1779753521757" duration="179000" />
+<<<<<<< HEAD
       <workItem from="1779784767780" duration="1277000" />
       <workItem from="1779926344737" duration="620000" />
       <workItem from="1779956216764" duration="933000" />
@@ -88,6 +93,10 @@
       <workItem from="1780387035210" duration="9000" />
       <workItem from="1780552496094" duration="2115000" />
       <workItem from="1780617850267" duration="7615000" />
+=======
+      <workItem from="1780743717866" duration="1440000" />
+      <workItem from="1781442240129" duration="3736000" />
+>>>>>>> 7492808 (add advertise page and update ad layout)
     </task>
     <servers />
   </component>

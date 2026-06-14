@@ -69,6 +69,7 @@ export async function generateMetadata({
     const { month, day } = await params;
     const { monthNumber, dayNumber } = toDateNumbers(month, day);
 
+<<<<<<< HEAD
     if (!isValidMonthDay(monthNumber, dayNumber)) {
         return {
             title: `날짜 정보를 찾을 수 없습니다 | ${SITE_NAME}`,
@@ -79,6 +80,10 @@ export async function generateMetadata({
     const description = getDatePageDescription(monthNumber, dayNumber);
     const siteUrl = getSiteUrl();
     const pageUrl = `${siteUrl}/date/${monthNumber}/${dayNumber}`;
+=======
+    const title = `${monthNumber}월 ${dayNumber}일 생일·사건·기념일`;
+    const description = `${monthNumber}월 ${dayNumber}일 생일, 사건·사고, 기념일, 인터넷 이슈, 밈성 날짜를 모아둔 페이지.`;
+>>>>>>> 7492808 (add advertise page and update ad layout)
 
     return {
         title,
@@ -117,11 +122,13 @@ export default async function DatePage({ params }: DatePageProps) {
         (event) => event.type === "ANNIVERSARY"
     );
     const historyEvents = events.filter((event) => event.type === "HISTORY");
+    const memeEvents = events.filter((event) => event.type === "MEME");
     const otherEvents = events.filter(
         (event) =>
             event.type !== "BIRTHDAY" &&
             event.type !== "ANNIVERSARY" &&
-            event.type !== "HISTORY"
+            event.type !== "HISTORY" &&
+            event.type !== "MEME"
     );
 
     const dateLabel = getDateLabel(monthNumber, dayNumber);
@@ -137,10 +144,16 @@ export default async function DatePage({ params }: DatePageProps) {
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
+<<<<<<< HEAD
         name: getDatePageTitle(monthNumber, dayNumber),
         description: getDatePageDescription(monthNumber, dayNumber),
         url: pageUrl,
         inLanguage: "ko-KR",
+=======
+        name: `${monthNumber}월 ${dayNumber}일 생일·사건·기념일`,
+        description: `${monthNumber}월 ${dayNumber}일에 걸려 있는 생일, 사건, 기념일, 인터넷 이슈를 모은 날짜별 기록 페이지.`,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://tadaylab.today"}/date/${monthNumber}/${dayNumber}`,
+>>>>>>> 7492808 (add advertise page and update ad layout)
         isPartOf: {
             "@type": "WebSite",
             name: SITE_NAME,
@@ -176,6 +189,7 @@ export default async function DatePage({ params }: DatePageProps) {
                         Date Archive
                     </p>
 
+<<<<<<< HEAD
                     <h1 className="text-3xl font-black tracking-tight text-gray-950 md:text-4xl">
                         {dateLabel} 생일인 사람·연예인·기념일
                     </h1>
@@ -183,6 +197,15 @@ export default async function DatePage({ params }: DatePageProps) {
                     <p className="mt-4 max-w-3xl text-base leading-7 text-gray-600">
                         {dateLabel} 생일인 사람, 연예인, 아이돌, 인플루언서와 같은
                         날짜의 기념일·역사 정보를 확인하세요.
+=======
+                    <h1 className="text-3xl font-black tracking-tight text-gray-950">
+                        {monthNumber}월 {dayNumber}일 생일·사건·기념일
+                    </h1>
+
+                    <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-500">
+                        {monthNumber}월 {dayNumber}일에 걸려 있는 생일, 사건,
+                        사고, 기념일, 인터넷 이슈, 밈성 날짜들.
+>>>>>>> 7492808 (add advertise page and update ad layout)
                     </p>
 
                     <div className="mt-6 rounded-2xl bg-gray-50 p-5">
@@ -242,6 +265,7 @@ export default async function DatePage({ params }: DatePageProps) {
                     <div className="space-y-10">
                         {birthdayEvents.length > 0 && (
                             <section>
+<<<<<<< HEAD
                                 <div className="mb-4">
                                     <h2 className="text-2xl font-black text-gray-950">
                                         {dateLabel} 생일인 사람
@@ -252,6 +276,11 @@ export default async function DatePage({ params }: DatePageProps) {
                                     </p>
                                 </div>
 
+=======
+                                <h2 className="mb-4 text-2xl font-black text-gray-950">
+                                    {monthNumber}월 {dayNumber}일 생일
+                                </h2>
+>>>>>>> 7492808 (add advertise page and update ad layout)
                                 <EventList events={birthdayEvents} />
                             </section>
                         )}
@@ -274,6 +303,7 @@ export default async function DatePage({ params }: DatePageProps) {
 
                         {historyEvents.length > 0 && (
                             <section>
+<<<<<<< HEAD
                                 <div className="mb-4">
                                     <h2 className="text-2xl font-black text-gray-950">
                                         {dateLabel} 역사적 사건
@@ -284,12 +314,27 @@ export default async function DatePage({ params }: DatePageProps) {
                                     </p>
                                 </div>
 
+=======
+                                <h2 className="mb-4 text-2xl font-black text-gray-950">
+                                    {monthNumber}월 {dayNumber}일 사건·사고
+                                </h2>
+>>>>>>> 7492808 (add advertise page and update ad layout)
                                 <EventList events={historyEvents} />
+                            </section>
+                        )}
+
+                        {memeEvents.length > 0 && (
+                            <section>
+                                <h2 className="mb-4 text-2xl font-black text-gray-950">
+                                    {monthNumber}월 {dayNumber}일 밈·인터넷 이슈
+                                </h2>
+                                <EventList events={memeEvents} />
                             </section>
                         )}
 
                         {otherEvents.length > 0 && (
                             <section>
+<<<<<<< HEAD
                                 <div className="mb-4">
                                     <h2 className="text-2xl font-black text-gray-950">
                                         {dateLabel} 기타 날짜 정보
@@ -301,6 +346,11 @@ export default async function DatePage({ params }: DatePageProps) {
                                     </p>
                                 </div>
 
+=======
+                                <h2 className="mb-4 text-2xl font-black text-gray-950">
+                                    {monthNumber}월 {dayNumber}일 기타 기록
+                                </h2>
+>>>>>>> 7492808 (add advertise page and update ad layout)
                                 <EventList events={otherEvents} />
                             </section>
                         )}
@@ -308,19 +358,19 @@ export default async function DatePage({ params }: DatePageProps) {
                 ) : (
                     <section className="rounded-3xl bg-white p-8 text-center shadow-sm">
                         <h2 className="text-xl font-bold text-gray-950">
-                            아직 등록된 생일·기념일 정보가 없습니다
+                            아직 이 날짜는 비어 있음
                         </h2>
 
                         <p className="mt-2 text-sm text-gray-500">
-                            이 날짜의 생일, 기념일, 역사적 사건을 알고 있다면
-                            제보해주세요.
+                            이 날짜의 생일, 사건, 기념일, 인터넷 이슈를 알고 있다면
+                            제보해줘.
                         </p>
 
                         <Link
                             href="/submit"
                             className="mt-6 inline-flex rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white"
                         >
-                            날짜 정보 제보하기
+                            날짜 기록 제보하기
                         </Link>
                     </section>
                 )}

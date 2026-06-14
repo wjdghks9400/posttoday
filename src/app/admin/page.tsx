@@ -36,7 +36,7 @@ export default async function AdminPage() {
                     </form>
                 </div>
 
-                <section className="grid gap-4 md:grid-cols-4">
+                <section className="grid gap-4 md:grid-cols-5">
                     <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
                         <p className="text-sm font-semibold text-gray-500">
                             등록 소재
@@ -76,9 +76,19 @@ export default async function AdminPage() {
                             {stats.pendingSubmissions}
                         </p>
                     </div>
+
+                    <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+                        <p className="text-sm font-semibold text-gray-500">
+                            한줄쓰기
+                        </p>
+
+                        <p className="mt-4 text-3xl font-black text-gray-950">
+                            {stats.activeOneLines}
+                        </p>
+                    </div>
                 </section>
 
-                <section className="mt-8 grid gap-5 md:grid-cols-3">
+                <section className="mt-8 grid gap-5 md:grid-cols-4">
                     <Link
                         href="/admin/submissions"
                         className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
@@ -110,6 +120,23 @@ export default async function AdminPage() {
 
                         <p className="mt-4 text-sm leading-6 text-gray-500">
                             등록된 생일, 기념일, 밈, 사건, 캐릭터 정보를 관리합니다.
+                        </p>
+                    </Link>
+
+                    <Link
+                        href="/admin/one-lines"
+                        className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                    >
+                        <p className="mb-4 text-sm font-semibold text-gray-500">
+                            One-line
+                        </p>
+
+                        <h2 className="text-2xl font-black text-gray-950">
+                            한줄쓰기 관리
+                        </h2>
+
+                        <p className="mt-4 text-sm leading-6 text-gray-500">
+                            상세 페이지에 남겨진 한줄을 확인하고 스팸성 글을 삭제합니다.
                         </p>
                     </Link>
 

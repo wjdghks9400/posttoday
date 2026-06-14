@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getAdminDashboardStats() {
-    const [events, pendingSubmissions] = await Promise.all([
+    const [events, pendingSubmissions, activeOneLines] = await Promise.all([
         prisma.event.findMany({
             where: {
                 status: "PUBLISHED",
@@ -15,6 +15,11 @@ export async function getAdminDashboardStats() {
                 status: "PENDING",
             },
         }),
+        prisma.oneLine.count({
+            where: {
+                deletedAt: null,
+            },
+        }),
     ]);
 
     return {
@@ -24,5 +29,6 @@ export async function getAdminDashboardStats() {
         communityEvents: events.filter((event) => event.trustLevel === "COMMUNITY")
             .length,
         pendingSubmissions,
+        activeOneLines,
     };
 }
