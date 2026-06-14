@@ -27,13 +27,8 @@ interface EventDetailPageProps {
 
 export const revalidate = 60;
 
-<<<<<<< HEAD
-const SITE_NAME = "TodayLab";
-const DEFAULT_SITE_URL = "https://todaylab.today";
-=======
 const SITE_NAME = "TadayLab";
 const DEFAULT_SITE_URL = "https://tadaylab.today";
->>>>>>> 7492808 (add advertise page and update ad layout)
 
 function safeDecodeSlug(slug: string) {
     try {
@@ -46,26 +41,9 @@ function safeDecodeSlug(slug: string) {
 function getSiteUrl() {
     return process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL;
 }
-<<<<<<< HEAD
-
-function getEventPageTitle(event: CalendarEvent) {
-    const dateLabel = formatMonthDay(event.month, event.day);
-=======
->>>>>>> 7492808 (add advertise page and update ad layout)
 
 function getDisplayTitle(event: CalendarEvent) {
     if (event.type === "BIRTHDAY") {
-<<<<<<< HEAD
-        return `${event.title} 생일은 언제? ${dateLabel} 생일 정보`;
-    }
-
-    if (event.type === "ANNIVERSARY") {
-        return `${event.title} 기념일은 언제? ${dateLabel} 기념일 정보`;
-    }
-
-    if (event.type === "HISTORY") {
-        return `${event.title} - ${dateLabel} 역사 정보`;
-=======
         return `${event.title} 생일`;
     }
 
@@ -94,7 +72,6 @@ function getEventPageTitle(event: CalendarEvent) {
 
     if (event.type === "HISTORY") {
         return `${event.title} - ${dateLabel} 사건 기록`;
->>>>>>> 7492808 (add advertise page and update ad layout)
     }
 
     return `${event.title} - ${dateLabel} 날짜 정보`;
@@ -104,40 +81,6 @@ function getEventMetaDescription(event: CalendarEvent) {
     const dateLabel = formatMonthDay(event.month, event.day);
 
     if (event.type === "BIRTHDAY") {
-<<<<<<< HEAD
-        return `${event.title} 생일은 ${dateLabel}입니다. ${categoryLabel} 분야의 생일 정보와 공개 출처를 ${SITE_NAME}에서 확인하세요.`;
-    }
-
-    if (event.type === "ANNIVERSARY") {
-        return `${event.title} 기념일은 ${dateLabel}입니다. ${categoryLabel} 분야의 기념일 정보와 공개 출처를 ${SITE_NAME}에서 확인하세요.`;
-    }
-
-    return `${event.title}의 날짜는 ${dateLabel}입니다. ${categoryLabel} 분야의 ${typeLabel} 정보를 ${SITE_NAME}에서 확인하세요.`;
-}
-
-function getDisplayTitle(event: CalendarEvent) {
-    if (event.type === "BIRTHDAY") {
-        return `${event.title} 생일`;
-    }
-
-    if (event.type === "ANNIVERSARY") {
-        return `${event.title} 기념일`;
-    }
-
-    return event.title;
-}
-
-function getQuestionTitle(event: CalendarEvent) {
-    if (event.type === "BIRTHDAY") {
-        return `${event.title} 생일은 언제인가요?`;
-    }
-
-    if (event.type === "ANNIVERSARY") {
-        return `${event.title} 기념일은 언제인가요?`;
-    }
-
-    return `${event.title} 날짜는 언제인가요?`;
-=======
         return `${event.title} 생일은 ${dateLabel}. 출처랑 한줄 기록을 모아둔 페이지.`;
     }
 
@@ -154,23 +97,12 @@ function getQuestionTitle(event: CalendarEvent) {
     }
 
     return `${event.title}은 ${dateLabel}. 관련 출처와 한줄 기록을 모아둔 페이지.`;
->>>>>>> 7492808 (add advertise page and update ad layout)
 }
 
 function getAnswerText(event: CalendarEvent) {
     const dateLabel = formatMonthDay(event.month, event.day);
 
     if (event.type === "BIRTHDAY") {
-<<<<<<< HEAD
-        return `${event.title} 생일은 ${dateLabel}입니다.`;
-    }
-
-    if (event.type === "ANNIVERSARY") {
-        return `${event.title} 기념일은 ${dateLabel}입니다.`;
-    }
-
-    return `${event.title}의 날짜는 ${dateLabel}입니다.`;
-=======
         return `${event.title} 생일은 ${dateLabel}.`;
     }
 
@@ -207,7 +139,6 @@ function getQuestionTitle(event: CalendarEvent) {
     }
 
     return `${event.title} 날짜는 언제?`;
->>>>>>> 7492808 (add advertise page and update ad layout)
 }
 
 function getRelatedSectionTitle(event: CalendarEvent) {
@@ -216,12 +147,6 @@ function getRelatedSectionTitle(event: CalendarEvent) {
     }
 
     if (event.type === "ANNIVERSARY") {
-<<<<<<< HEAD
-        return "같은 날짜의 다른 기념일·생일";
-    }
-
-    return "같은 날짜의 다른 정보";
-=======
         return "같은 날짜의 다른 기념일·사건";
     }
 
@@ -246,7 +171,6 @@ function getInfoSectionTitle(event: CalendarEvent) {
     }
 
     return `${event.title} 관련 기록`;
->>>>>>> 7492808 (add advertise page and update ad layout)
 }
 
 export async function generateMetadata({
@@ -259,15 +183,9 @@ export async function generateMetadata({
 
     if (!event) {
         return {
-<<<<<<< HEAD
-            title: `생일·기념일 정보 | ${SITE_NAME}`,
-            description:
-                "날짜별 생일, 기념일, 역사적 사건, K-POP, 게임, 애니, 브랜드 관련 날짜 정보를 검색하세요.",
-=======
             title: `생일·사건·기념일 기록 | ${SITE_NAME}`,
             description:
                 "생일, 사건, 사고, 기념일, 인터넷 대첩, 밈성 날짜를 모아두는 B급 날짜 기록장.",
->>>>>>> 7492808 (add advertise page and update ad layout)
         };
     }
 
@@ -427,11 +345,7 @@ export default async function EventDetailPage({
                     <div className="space-y-6">
                         <section className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
                             <p className="mb-2 text-sm font-bold text-gray-500">
-<<<<<<< HEAD
-                                Answer
-=======
                                 Quick Answer
->>>>>>> 7492808 (add advertise page and update ad layout)
                             </p>
 
                             <h2 className="mb-4 text-2xl font-black text-gray-950">
@@ -485,18 +399,11 @@ export default async function EventDetailPage({
                             </div>
                         </section>
 
-<<<<<<< HEAD
-                        <section className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
-                            <p className="mb-2 text-sm font-bold text-gray-500">
-                                Information
-                            </p>
-=======
                         {event.description && (
                             <section className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
                                 <p className="mb-2 text-sm font-bold text-gray-500">
                                     Record
                                 </p>
->>>>>>> 7492808 (add advertise page and update ad layout)
 
                                 <h2 className="mb-5 text-2xl font-black text-gray-950">
                                     {getInfoSectionTitle(event)}
@@ -599,24 +506,8 @@ export default async function EventDetailPage({
 
                             <div className="space-y-4 text-sm leading-6 text-gray-600">
                                 <p>
-<<<<<<< HEAD
-                                    {SITE_NAME}은 공개적으로 확인 가능한 생일, 기념일,
-                                    역사적 사건, 출시일, 팬덤·브랜드 관련 날짜 정보를
-                                    바탕으로 운영됩니다.
-                                </p>
-
-                                <p>
-                                    비공개 개인정보, 추정 정보, 사적 정보는 등록하지 않는
-                                    것을 원칙으로 합니다.
-                                </p>
-
-                                <p>
-                                    사용자가 보낸 수정 제안과 출처 추가 요청은 관리자 검수
-                                    후 반영됩니다.
-=======
                                     공개적으로 확인 가능한 생일, 기념일, 사건, 출시일,
                                     팬덤·브랜드 관련 날짜를 중심으로 기록.
->>>>>>> 7492808 (add advertise page and update ad layout)
                                 </p>
                             </div>
                         </section>
@@ -736,11 +627,7 @@ export default async function EventDetailPage({
                             </h2>
 
                             <p className="mt-2 text-sm text-gray-500">
-<<<<<<< HEAD
-                                {dateLabel}에 등록된 다른 날짜 정보를 함께 확인해보세요.
-=======
                                 {dateLabel}에 걸려 있는 다른 기록들.
->>>>>>> 7492808 (add advertise page and update ad layout)
                             </p>
                         </div>
 

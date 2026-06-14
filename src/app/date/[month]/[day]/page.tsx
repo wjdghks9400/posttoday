@@ -69,21 +69,8 @@ export async function generateMetadata({
     const { month, day } = await params;
     const { monthNumber, dayNumber } = toDateNumbers(month, day);
 
-<<<<<<< HEAD
-    if (!isValidMonthDay(monthNumber, dayNumber)) {
-        return {
-            title: `날짜 정보를 찾을 수 없습니다 | ${SITE_NAME}`,
-        };
-    }
-
-    const title = getDatePageTitle(monthNumber, dayNumber);
-    const description = getDatePageDescription(monthNumber, dayNumber);
-    const siteUrl = getSiteUrl();
-    const pageUrl = `${siteUrl}/date/${monthNumber}/${dayNumber}`;
-=======
     const title = `${monthNumber}월 ${dayNumber}일 생일·사건·기념일`;
     const description = `${monthNumber}월 ${dayNumber}일 생일, 사건·사고, 기념일, 인터넷 이슈, 밈성 날짜를 모아둔 페이지.`;
->>>>>>> 7492808 (add advertise page and update ad layout)
 
     return {
         title,
@@ -144,16 +131,9 @@ export default async function DatePage({ params }: DatePageProps) {
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
-<<<<<<< HEAD
-        name: getDatePageTitle(monthNumber, dayNumber),
-        description: getDatePageDescription(monthNumber, dayNumber),
-        url: pageUrl,
-        inLanguage: "ko-KR",
-=======
         name: `${monthNumber}월 ${dayNumber}일 생일·사건·기념일`,
         description: `${monthNumber}월 ${dayNumber}일에 걸려 있는 생일, 사건, 기념일, 인터넷 이슈를 모은 날짜별 기록 페이지.`,
         url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://tadaylab.today"}/date/${monthNumber}/${dayNumber}`,
->>>>>>> 7492808 (add advertise page and update ad layout)
         isPartOf: {
             "@type": "WebSite",
             name: SITE_NAME,
@@ -189,15 +169,6 @@ export default async function DatePage({ params }: DatePageProps) {
                         Date Archive
                     </p>
 
-<<<<<<< HEAD
-                    <h1 className="text-3xl font-black tracking-tight text-gray-950 md:text-4xl">
-                        {dateLabel} 생일인 사람·연예인·기념일
-                    </h1>
-
-                    <p className="mt-4 max-w-3xl text-base leading-7 text-gray-600">
-                        {dateLabel} 생일인 사람, 연예인, 아이돌, 인플루언서와 같은
-                        날짜의 기념일·역사 정보를 확인하세요.
-=======
                     <h1 className="text-3xl font-black tracking-tight text-gray-950">
                         {monthNumber}월 {dayNumber}일 생일·사건·기념일
                     </h1>
@@ -205,7 +176,6 @@ export default async function DatePage({ params }: DatePageProps) {
                     <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-500">
                         {monthNumber}월 {dayNumber}일에 걸려 있는 생일, 사건,
                         사고, 기념일, 인터넷 이슈, 밈성 날짜들.
->>>>>>> 7492808 (add advertise page and update ad layout)
                     </p>
 
                     <div className="mt-6 rounded-2xl bg-gray-50 p-5">
@@ -265,22 +235,9 @@ export default async function DatePage({ params }: DatePageProps) {
                     <div className="space-y-10">
                         {birthdayEvents.length > 0 && (
                             <section>
-<<<<<<< HEAD
-                                <div className="mb-4">
-                                    <h2 className="text-2xl font-black text-gray-950">
-                                        {dateLabel} 생일인 사람
-                                    </h2>
-
-                                    <p className="mt-2 text-sm leading-6 text-gray-500">
-                                        {dateLabel}에 생일로 등록된 인물 정보입니다.
-                                    </p>
-                                </div>
-
-=======
                                 <h2 className="mb-4 text-2xl font-black text-gray-950">
                                     {monthNumber}월 {dayNumber}일 생일
                                 </h2>
->>>>>>> 7492808 (add advertise page and update ad layout)
                                 <EventList events={birthdayEvents} />
                             </section>
                         )}
@@ -303,22 +260,9 @@ export default async function DatePage({ params }: DatePageProps) {
 
                         {historyEvents.length > 0 && (
                             <section>
-<<<<<<< HEAD
-                                <div className="mb-4">
-                                    <h2 className="text-2xl font-black text-gray-950">
-                                        {dateLabel} 역사적 사건
-                                    </h2>
-
-                                    <p className="mt-2 text-sm leading-6 text-gray-500">
-                                        {dateLabel}에 등록된 역사·사건 정보입니다.
-                                    </p>
-                                </div>
-
-=======
                                 <h2 className="mb-4 text-2xl font-black text-gray-950">
                                     {monthNumber}월 {dayNumber}일 사건·사고
                                 </h2>
->>>>>>> 7492808 (add advertise page and update ad layout)
                                 <EventList events={historyEvents} />
                             </section>
                         )}
@@ -334,23 +278,9 @@ export default async function DatePage({ params }: DatePageProps) {
 
                         {otherEvents.length > 0 && (
                             <section>
-<<<<<<< HEAD
-                                <div className="mb-4">
-                                    <h2 className="text-2xl font-black text-gray-950">
-                                        {dateLabel} 기타 날짜 정보
-                                    </h2>
-
-                                    <p className="mt-2 text-sm leading-6 text-gray-500">
-                                        {dateLabel}에 등록된 게임, 애니, 브랜드, 밈, 팬덤
-                                        관련 날짜 정보입니다.
-                                    </p>
-                                </div>
-
-=======
                                 <h2 className="mb-4 text-2xl font-black text-gray-950">
                                     {monthNumber}월 {dayNumber}일 기타 기록
                                 </h2>
->>>>>>> 7492808 (add advertise page and update ad layout)
                                 <EventList events={otherEvents} />
                             </section>
                         )}
