@@ -71,6 +71,8 @@ export async function generateMetadata({
 
     const title = `${monthNumber}월 ${dayNumber}일 생일·사건·기념일`;
     const description = `${monthNumber}월 ${dayNumber}일 생일, 사건·사고, 기념일, 인터넷 이슈, 밈성 날짜를 모아둔 페이지.`;
+    const siteUrl = getSiteUrl();
+    const pageUrl = `${siteUrl}/date/${monthNumber}/${dayNumber}`;
 
     return {
         title,

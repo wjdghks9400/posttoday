@@ -175,27 +175,37 @@ function getInfoSectionTitle(event: CalendarEvent) {
 
 export async function generateMetadata({
                                            params,
-                                       }: DatePageProps): Promise<Metadata> {
-    const { month, day } = await params;
-    const { monthNumber, dayNumber } = toDateNumbers(month, day);
+                                       }: EventDetailPageProps): Promise<Metadata> {
+    const { slug } = await params;
+    const decodedSlug = safeDecodeSlug(slug);
 
-    const title = `${monthNumber}월 ${dayNumber}일 생일·사건·기념일`;
-    const description = `${monthNumber}월 ${dayNumber}일 생일, 사건·사고, 기념일, 인터넷 이슈, 밈성 날짜를 모아둔 페이지.`;
+    const event = await getEventBySlugFromDb(decodedSlug);
+
+    if (!event) {
+        return {
+            title: `생일·사건·기념일 기록 | ${SITE_NAME}`,
+            description:
+                "생일, 사건, 사고, 기념일, 인터넷 대첩, 밈성 날짜를 모아두는 B급 날짜 기록장.",
+        };
+    }
+
+    const title = getEventPageTitle(event);
+    const description = getEventMetaDescription(event);
     const siteUrl = getSiteUrl();
-    const pageUrl = `${siteUrl}/date/${monthNumber}/${dayNumber}`;
+    const pageUrl = `${siteUrl}/events/${event.slug}`;
 
     return {
         title,
         description,
         alternates: {
-            canonical: `/date/${monthNumber}/${dayNumber}`,
+            canonical: `/events/${event.slug}`,
         },
         openGraph: {
             title: `${title} | ${SITE_NAME}`,
             description,
             url: pageUrl,
             siteName: SITE_NAME,
-            type: "website",
+            type: "article",
             locale: "ko_KR",
         },
         twitter: {
