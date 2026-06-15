@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { CalendarEvent } from "@/types/event";
 import { Prisma } from "@prisma/client";
+import { normalizeCalendarEventCategory, normalizeCalendarSourceType } from "@/lib/event-options";
 
 type PrismaEventWithRelations = Prisma.EventGetPayload<{
     include: {
@@ -22,7 +23,7 @@ function mapEvent(event: PrismaEventWithRelations): CalendarEvent {
         day: event.day,
         year: event.year ?? undefined,
         type: event.type as CalendarEvent["type"],
-        category: event.category.toLowerCase() as CalendarEvent["category"],
+        category: normalizeCalendarEventCategory(event.category),
         description: event.description,
         contentIdea: event.contentIdea ?? "",
         trustLevel: event.trustLevel as CalendarEvent["trustLevel"],
@@ -31,7 +32,7 @@ function mapEvent(event: PrismaEventWithRelations): CalendarEvent {
             id: source.id,
             title: source.title,
             url: source.url,
-            type: source.type.toLowerCase() as CalendarEvent["sources"][number]["type"],
+            type: normalizeCalendarSourceType(source.type),
             verified: source.verified,
         })),
     };

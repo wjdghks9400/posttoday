@@ -1,5 +1,6 @@
 import { EventCategory, EventType, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { normalizeCalendarEventCategory, normalizeCalendarSourceType } from "@/lib/event-options";
 
 const eventTypes = [
     "BIRTHDAY",
@@ -139,7 +140,7 @@ export async function searchEvents({
         day: event.day,
         year: event.year ?? undefined,
         type: event.type,
-        category: event.category.toLowerCase(),
+        category: normalizeCalendarEventCategory(event.category),
         description: event.description,
         contentIdea: event.contentIdea ?? "",
         trustLevel: event.trustLevel,
@@ -148,7 +149,7 @@ export async function searchEvents({
             id: source.id,
             title: source.title,
             url: source.url,
-            type: source.type.toLowerCase(),
+            type: normalizeCalendarSourceType(source.type),
             verified: source.verified,
         })),
     }));

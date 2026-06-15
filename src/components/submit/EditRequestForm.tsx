@@ -7,8 +7,8 @@ import {
     SubmitState,
 } from "@/app/submit/actions";
 import {
-    calendarEventCategoryLabelMap,
-    eventTypeLabelMap,
+    getCalendarEventCategoryLabel,
+    getEventTypeLabel,
 } from "@/lib/event-options";
 import { formatMonthDay } from "@/lib/date";
 import { CalendarEvent } from "@/types/event";
@@ -104,14 +104,14 @@ export default function EditRequestForm({ event }: { event: CalendarEvent }) {
                         <div className="rounded-2xl bg-white p-4">
                             <p className="text-gray-400">분류</p>
                             <p className="mt-1 font-bold text-gray-950">
-                                {eventTypeLabelMap[event.type]}
+                                {getEventTypeLabel(event.type)}
                             </p>
                         </div>
 
                         <div className="rounded-2xl bg-white p-4">
                             <p className="text-gray-400">분야</p>
                             <p className="mt-1 font-bold text-gray-950">
-                                {calendarEventCategoryLabelMap[event.category]}
+                                {getCalendarEventCategoryLabel(event.category)}
                             </p>
                         </div>
 

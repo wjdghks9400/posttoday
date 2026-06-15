@@ -5,8 +5,10 @@ import SearchBox from "@/components/search/SearchBox";
 import { searchEvents } from "@/lib/db/search";
 import { CalendarEvent } from "@/types/event";
 import {
-    eventCategoryLabelMap,
-    eventTypeLabelMap,
+    getPrismaEventCategoryLabel,
+    getEventTypeLabel,
+    normalizeCalendarEventCategory,
+    normalizeCalendarSourceType,
 } from "@/lib/event-options";
 
 interface SearchPageProps {
@@ -37,11 +39,11 @@ function normalizeEvents(events: Awaited<ReturnType<typeof searchEvents>>): Cale
     return events.map((event) => ({
         ...event,
         type: event.type as CalendarEvent["type"],
-        category: event.category as CalendarEvent["category"],
+        category: normalizeCalendarEventCategory(event.category),
         trustLevel: event.trustLevel as CalendarEvent["trustLevel"],
         sources: event.sources.map((source) => ({
             ...source,
-            type: source.type as CalendarEvent["sources"][number]["type"],
+            type: normalizeCalendarSourceType(source.type),
         })),
     }));
 }
@@ -51,9 +53,7 @@ function getTypeLabel(type?: string) {
         return "전체";
     }
 
-    const key = type.toUpperCase() as keyof typeof eventTypeLabelMap;
-
-    return eventTypeLabelMap[key] ?? "전체";
+    return getEventTypeLabel(type);
 }
 
 function getCategoryLabel(category?: string) {
@@ -61,9 +61,7 @@ function getCategoryLabel(category?: string) {
         return "전체 카테고리";
     }
 
-    const key = category.toUpperCase() as keyof typeof eventCategoryLabelMap;
-
-    return eventCategoryLabelMap[key] ?? "전체 카테고리";
+    return getPrismaEventCategoryLabel(category);
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {

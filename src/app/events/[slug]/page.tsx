@@ -12,9 +12,9 @@ import {
     getRelatedEventsFromDb,
 } from "@/lib/db/events";
 import {
-    calendarEventCategoryLabelMap,
-    eventTypeEmojiMap,
-    eventTypeLabelMap,
+    getCalendarEventCategoryLabel,
+    getEventTypeEmoji,
+    getEventTypeLabel,
 } from "@/lib/event-options";
 import { CalendarEvent } from "@/types/event";
 import { getOneLinesByEventId } from "@/lib/db/one-lines";
@@ -239,8 +239,8 @@ export default async function EventDetailPage({
     const displayTitle = getDisplayTitle(event);
     const questionTitle = getQuestionTitle(event);
     const answerText = getAnswerText(event);
-    const categoryLabel = calendarEventCategoryLabelMap[event.category];
-    const typeLabel = eventTypeLabelMap[event.type];
+    const categoryLabel = getCalendarEventCategoryLabel(event.category);
+    const typeLabel = getEventTypeLabel(event.type);
 
     const jsonLd = {
         "@context": "https://schema.org",
@@ -289,7 +289,7 @@ export default async function EventDetailPage({
                         <div>
                             <div className="mb-4 flex flex-wrap items-center gap-2">
                                 <span className="rounded-full bg-gray-100 px-3 py-1.5 text-sm font-bold text-gray-700">
-                                    {eventTypeEmojiMap[event.type]} {typeLabel}
+                                    {getEventTypeEmoji(event.type)} {typeLabel}
                                 </span>
 
                                 <span className="rounded-full bg-gray-100 px-3 py-1.5 text-sm font-bold text-gray-700">

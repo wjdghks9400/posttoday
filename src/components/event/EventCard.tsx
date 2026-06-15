@@ -2,9 +2,9 @@ import Link from "next/link";
 import { CalendarEvent } from "@/types/event";
 import TrustBadge from "@/components/event/TrustBadge";
 import {
-    calendarEventCategoryLabelMap,
-    eventTypeEmojiMap,
-    eventTypeLabelMap,
+    getCalendarEventCategoryLabel,
+    getEventTypeEmoji,
+    getEventTypeLabel,
 } from "@/lib/event-options";
 import { formatMonthDay } from "@/lib/date";
 
@@ -17,11 +17,11 @@ export default function EventCard({ event }: EventCardProps) {
         <article className="flex h-full flex-col rounded-3xl border border-gray-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
             <div className="mb-4 flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-700">
-                    {eventTypeEmojiMap[event.type]} {eventTypeLabelMap[event.type]}
+                    {getEventTypeEmoji(event.type)} {getEventTypeLabel(event.type)}
                 </span>
 
                 <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-700">
-                    {calendarEventCategoryLabelMap[event.category]}
+                    {getCalendarEventCategoryLabel(event.category)}
                 </span>
 
                 <TrustBadge trustLevel={event.trustLevel} />

@@ -97,27 +97,27 @@ function getMonthlyCounts(events: CalendarEvent[]) {
 function getCategoryCounts(events: CalendarEvent[]) {
     const targetCategories = [
         {
-            category: "KPOP",
+            category: "kpop",
             label: "K-POP",
         },
         {
-            category: "CELEBRITY",
+            category: "celebrity",
             label: "연예인",
         },
         {
-            category: "INFLUENCER",
+            category: "influencer",
             label: "인플루언서",
         },
         {
-            category: "ANIME",
+            category: "anime",
             label: "애니/만화",
         },
         {
-            category: "GAME",
+            category: "game",
             label: "게임",
         },
         {
-            category: "ESPORTS",
+            category: "esports",
             label: "e스포츠",
         },
     ] as const;
