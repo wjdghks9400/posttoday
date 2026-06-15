@@ -22,7 +22,7 @@ function mapEvent(event: PrismaEventWithRelations): CalendarEvent {
         day: event.day,
         year: event.year ?? undefined,
         type: event.type as CalendarEvent["type"],
-        category: event.category as CalendarEvent["category"],
+        category: event.category.toLowerCase() as CalendarEvent["category"],
         description: event.description,
         contentIdea: event.contentIdea ?? "",
         trustLevel: event.trustLevel as CalendarEvent["trustLevel"],
@@ -31,7 +31,7 @@ function mapEvent(event: PrismaEventWithRelations): CalendarEvent {
             id: source.id,
             title: source.title,
             url: source.url,
-            type: source.type as CalendarEvent["sources"][number]["type"],
+            type: source.type.toLowerCase() as CalendarEvent["sources"][number]["type"],
             verified: source.verified,
         })),
     };
