@@ -228,10 +228,8 @@ export default async function EventDetailPage({
         notFound();
     }
 
-    const [relatedEvents, oneLines] = await Promise.all([
-        getRelatedEventsFromDb(decodedSlug),
-        getOneLinesByEventId(event.id),
-    ]);
+    const relatedEvents = await getRelatedEventsFromDb(decodedSlug);
+    const oneLines = await getOneLinesByEventId(event.id);
 
     const dateLabel = formatMonthDay(event.month, event.day);
     const siteUrl = getSiteUrl();

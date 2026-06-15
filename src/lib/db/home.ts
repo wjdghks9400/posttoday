@@ -64,76 +64,74 @@ export async function getHomeDataFromDb() {
     const month = today.getMonth() + 1;
     const day = today.getDate();
 
-    const [todayEvents, allEvents, total, official, community, pending] =
-        await Promise.all([
-            prisma.event.findMany({
-                where: {
-                    month,
-                    day,
-                    status: "PUBLISHED",
-                },
+    const todayEvents = await prisma.event.findMany({
+        where: {
+            month,
+            day,
+            status: "PUBLISHED",
+        },
+        include: {
+            sources: true,
+            tags: {
                 include: {
-                    sources: true,
-                    tags: {
-                        include: {
-                            tag: true,
-                        },
-                    },
+                    tag: true,
                 },
-                orderBy: [
-                    {
-                        type: "asc",
-                    },
-                    {
-                        createdAt: "desc",
-                    },
-                ],
-            }),
+            },
+        },
+        orderBy: [
+            {
+                type: "asc",
+            },
+            {
+                createdAt: "desc",
+            },
+        ],
+    });
 
-            prisma.event.findMany({
-                where: {
-                    status: "PUBLISHED",
-                },
+    const allEvents = await prisma.event.findMany({
+        where: {
+            status: "PUBLISHED",
+        },
+        include: {
+            sources: true,
+            tags: {
                 include: {
-                    sources: true,
-                    tags: {
-                        include: {
-                            tag: true,
-                        },
-                    },
+                    tag: true,
                 },
-                orderBy: {
-                    createdAt: "desc",
-                },
-                take: 80,
-            }),
+            },
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+        take: 80,
+    });
 
-            prisma.event.count({
-                where: {
-                    status: "PUBLISHED",
-                },
-            }),
+    const total = await prisma.event.count({
+        where: {
+            status: "PUBLISHED",
+        },
+    });
 
-            prisma.event.count({
-                where: {
-                    status: "PUBLISHED",
-                    trustLevel: "OFFICIAL",
-                },
-            }),
+    const trustCounts = await prisma.event.groupBy({
+        by: ["trustLevel"],
+        where: {
+            status: "PUBLISHED",
+        },
+        _count: {
+            _all: true,
+        },
+    });
 
-            prisma.event.count({
-                where: {
-                    status: "PUBLISHED",
-                    trustLevel: "COMMUNITY",
-                },
-            }),
+    const pending = await prisma.submission.count({
+        where: {
+            status: "PENDING",
+        },
+    });
 
-            prisma.submission.count({
-                where: {
-                    status: "PENDING",
-                },
-            }),
-        ]);
+    const official =
+        trustCounts.find((item) => item.trustLevel === "OFFICIAL")?._count._all ?? 0;
+    const community =
+        trustCounts.find((item) => item.trustLevel === "COMMUNITY")?._count._all ?? 0;
 
     const upcomingEvents = allEvents
         .filter((event) => !(event.month === month && event.day === day))

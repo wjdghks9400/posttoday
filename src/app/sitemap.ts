@@ -1,11 +1,33 @@
 import type { MetadataRoute } from "next";
-import { getPublishedEvents } from "@/lib/db/events";
+import { prisma } from "@/lib/prisma";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
+
+type SitemapEvent = {
+    slug: string;
+    month: number;
+    day: number;
+    type: string;
+};
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://todaylab.today";
 
-    const events = await getPublishedEvents();
+    const events: SitemapEvent[] = await prisma.event.findMany({
+        where: {
+            status: "PUBLISHED",
+        },
+        select: {
+            slug: true,
+            month: true,
+            day: true,
+            type: true,
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
 
     const staticPages: MetadataRoute.Sitemap = [
         {

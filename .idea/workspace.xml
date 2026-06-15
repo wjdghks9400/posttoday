@@ -1,102 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
-  </component>
   <component name="ChangeListManager">
-    <list default="true" id="21c0c601-302c-4571-adea-c09605ca20bd" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/migrations/20260508152330_update_event_category/migration.sql" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/migrations/20260508152330_update_event_category/migration.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/migrations/migration_lock.toml" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/migrations/migration_lock.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/seed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/seed.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/admin/events/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/admin/events/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/admin/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/admin/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/date/[month]/[day]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/date/[month]/[day]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/events/[slug]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/events/[slug]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/db/admin.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/db/admin.ts" afterDir="false" />
-    </list>
+    <list default="true" id="a4f6c470-e516-4528-ba91-265e8348450f" name="변경" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 4
-}</component>
-  <component name="ProjectId" id="3DNl16tmP1l3vV6JVAMpSBsJgVD" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 5
+}]]></component>
+  <component name="ProjectId" id="3F9paAYF15X7L7u4rpaa7poVXBH" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/sideProject/ddalkkak_V1/fe2&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;D:\\DIARY\\posttoday\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "D:\\DIARY\\posttoday\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\DIARY\posttoday\src\app" />
-      <recent name="D:\DIARY\posttoday\src\events" />
-      <recent name="D:\DIARY\posttoday\src" />
-    </key>
-  </component>
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="애플리케이션 수준" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="디폴트 작업">
-      <changelist id="21c0c601-302c-4571-adea-c09605ca20bd" name="변경" comment="" />
-      <created>1778130191063</created>
+      <changelist id="a4f6c470-e516-4528-ba91-265e8348450f" name="변경" comment="" />
+      <created>1781497199373</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1778130191063</updated>
-      <workItem from="1778130192104" duration="5169000" />
-      <workItem from="1778135390074" duration="655000" />
-      <workItem from="1778199334544" duration="7566000" />
-      <workItem from="1778228570556" duration="636000" />
-      <workItem from="1778229698494" duration="365000" />
-      <workItem from="1778250320696" duration="17678000" />
-      <workItem from="1778500720949" duration="5386000" />
-      <workItem from="1778659969990" duration="1552000" />
-      <workItem from="1778724643403" duration="8478000" />
-      <workItem from="1778804560907" duration="1520000" />
-      <workItem from="1779414158239" duration="3126000" />
-      <workItem from="1779435779719" duration="2405000" />
-      <workItem from="1779753521757" duration="179000" />
-<<<<<<< HEAD
-      <workItem from="1779784767780" duration="1277000" />
-      <workItem from="1779926344737" duration="620000" />
-      <workItem from="1779956216764" duration="933000" />
-      <workItem from="1780013074769" duration="598000" />
-      <workItem from="1780272412833" duration="50000" />
-      <workItem from="1780377776677" duration="898000" />
-      <workItem from="1780387035210" duration="9000" />
-      <workItem from="1780552496094" duration="2115000" />
-      <workItem from="1780617850267" duration="7615000" />
-=======
-      <workItem from="1780743717866" duration="1440000" />
-      <workItem from="1781442240129" duration="3736000" />
->>>>>>> 7492808 (add advertise page and update ad layout)
+      <updated>1781497199373</updated>
+      <workItem from="1781497200774" duration="158000" />
     </task>
     <servers />
   </component>
