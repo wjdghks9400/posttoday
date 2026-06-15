@@ -8,9 +8,8 @@ import type { CalendarEvent } from "@/types/event";
 
 const SITE_NAME = "TodayLab";
 const DEFAULT_SITE_URL = "https://todaylab.today";
-
-export const revalidate = 60;
-
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export const metadata: Metadata = {
     title: `오늘의 생일 | ${SITE_NAME}`,
     description:
