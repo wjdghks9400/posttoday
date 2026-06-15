@@ -217,15 +217,8 @@ export async function getRelatedEventsFromDb(
             },
             ...(currentEvent
                 ? {
-                    OR: [
-                        {
-                            month: currentEvent.month,
-                            day: currentEvent.day,
-                        },
-                        {
-                            category: currentEvent.category,
-                        },
-                    ],
+                    month: currentEvent.month,
+                    day: currentEvent.day,
                 }
                 : {}),
         },
